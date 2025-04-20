@@ -1,4 +1,7 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
 
 @layer base {
   html {
@@ -6,12 +9,12 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
   }
-  
+
   body {
     color: #1a202c;
     background-color: white;
   }
-  
+
   /* Sử dụng CSS thuần thay vì @apply để tránh lỗi */
 
   /* Animation cho LoadingSpinner */
@@ -20,7 +23,7 @@
     8.333% { left: calc(0 * 30px); top: calc(1 * 30px); }
     100% { left: calc(0 * 30px); top: calc(1 * 30px); }
   }
-  
+
   @keyframes square2 {
     0% { left: calc(0 * 30px); top: calc(1 * 30px); }
     8.333% { left: calc(0 * 30px); top: calc(2 * 30px); }
@@ -30,7 +33,7 @@
     91.67% { left: calc(1 * 30px); top: calc(0 * 30px); }
     100% { left: calc(0 * 30px); top: calc(0 * 30px); }
   }
-  
+
   @keyframes square3 {
     0%,100% { left: calc(1 * 30px); top: calc(1 * 30px); }
     16.67% { left: calc(1 * 30px); top: calc(1 * 30px); }
@@ -42,7 +45,7 @@
     83.33% { left: calc(1 * 30px); top: calc(2 * 30px); }
     91.67% { left: calc(1 * 30px); top: calc(1 * 30px); }
   }
-  
+
   @keyframes square4 {
     0% { left: calc(2 * 30px); top: calc(1 * 30px); }
     33.33% { left: calc(2 * 30px); top: calc(1 * 30px); }
@@ -51,7 +54,7 @@
     58.33% { left: calc(3 * 30px); top: calc(1 * 30px); }
     100% { left: calc(3 * 30px); top: calc(1 * 30px); }
   }
-  
+
   @keyframes square5 {
     0% { left: calc(3 * 30px); top: calc(1 * 30px); }
     50.00% { left: calc(3 * 30px); top: calc(1 * 30px); }
@@ -60,7 +63,7 @@
     75.00% { left: calc(2 * 30px); top: calc(1 * 30px); }
     100% { left: calc(2 * 30px); top: calc(1 * 30px); }
   }
-  
+
   @keyframes squarefadein {
     0% { transform: scale(0.75); opacity: 0; }
     100% { transform: scale(1.0); opacity: 1; }
@@ -79,7 +82,7 @@
     width: 100%;
     transition: all 0.2s ease;
   }
-  
+
   input[type="text"]:focus,
   input[type="password"]:focus,
   input[type="email"]:focus,
@@ -91,13 +94,13 @@
     box-shadow: 0 0 0 3px rgba(243, 112, 33, 0.3);
     outline: none;
   }
-  
+
   input[type="checkbox"] {
     color: #F37021;
     border-color: #d1d5db;
     border-radius: 0.25rem;
   }
-  
+
   input[type="checkbox"]:focus {
     box-shadow: 0 0 0 3px rgba(243, 112, 33, 0.3);
   }
@@ -130,6 +133,14 @@
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
+  --sidebar: hsl(0 0% 98%);
+  --sidebar-foreground: hsl(240 5.3% 26.1%);
+  --sidebar-primary: hsl(240 5.9% 10%);
+  --sidebar-primary-foreground: hsl(0 0% 98%);
+  --sidebar-accent: hsl(240 4.8% 95.9%);
+  --sidebar-accent-foreground: hsl(240 5.9% 10%);
+  --sidebar-border: hsl(220 13% 91%);
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
 }
 
 .dark {
@@ -151,4 +162,32 @@
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
+  --sidebar: hsl(240 5.9% 10%);
+  --sidebar-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-primary: hsl(224.3 76.3% 48%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(240 3.7% 15.9%);
+  --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-border: hsl(240 3.7% 15.9%);
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
+}
+
+@theme inline {
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }
