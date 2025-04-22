@@ -1,14 +1,18 @@
 import { memo, Suspense } from 'react';
 import { useLoaderData, Await } from 'react-router-dom';
-import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { HomeRouteData, HomeLoaderData } from '@/routes/home/home.types';
+import { PageLoading } from '@/components/ui/page-loading';
 
 const HomeComponent = () => {
   const { data } = useLoaderData<HomeRouteData>();
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh]">
-      <Suspense fallback={<LoadingSpinner />}>
+      <Suspense fallback={
+        <>
+          <PageLoading />
+        </>
+      }>
         <Await
           resolve={data}
           errorElement={
