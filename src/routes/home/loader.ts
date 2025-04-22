@@ -1,5 +1,5 @@
 import { LoaderFunction } from 'react-router-dom';
-import { HomeLoaderData } from './home.types';
+import { HomeLoaderData } from './types';
 
 /**
  * Loader function for the home route
@@ -9,7 +9,7 @@ export const homeLoader: LoaderFunction = async (): Promise<{ data: HomeLoaderDa
   try {
     // Simulate API call
     const data = await new Promise<HomeLoaderData>(resolve => 
-      setTimeout(() => resolve({ message: 'Data loaded successfully!' }), 1000)
+      setTimeout(() => resolve({ message: 'Data loaded successfully!' }), 100)
     );
 
     return { data };

@@ -1,6 +1,6 @@
 import { RouteObject } from 'react-router-dom';
 import { Home } from '@/pages/Home';
-import { homeLoader } from './home.loader';
+import { homeLoader } from './loader';
 
 export const HOME_ROUTE = '/' as const;
 

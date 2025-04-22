@@ -205,6 +205,8 @@
   --color-blue-700: oklch(0.278 0.033 256.848);
   --color-blue-800: oklch(0.21 0.034 264.665);
   --color-blue-900: oklch(0.13 0.028 261.692);
+
+  --header-height: 56px;
 }
 
 .dark {
