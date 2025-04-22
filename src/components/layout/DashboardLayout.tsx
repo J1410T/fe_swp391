@@ -2,7 +2,7 @@ import React, { ReactNode } from "react";
 import AppSidebar from "./Sidebar";
 import { useAuth } from "@/context/AuthContext";
 import { SidebarProvider } from "@/components/ui/sidebar";
-
+import { Toaster } from "@/components/ui/sonner";
 interface DashboardLayoutProps {
   children: ReactNode;
 }
@@ -40,6 +40,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
           </main>
         </div>
       </SidebarProvider>
+      <Toaster richColors position="top-right" />
     </div>
   );
 };

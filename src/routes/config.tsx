@@ -1,42 +1,48 @@
-import { RouteObject, Navigate } from 'react-router-dom';
-import { lazy, Suspense } from 'react';
-import { LoadingSpinner } from '@/components/ui';
-import LoadingRoute from '@/components/ui/LoadingRoute';
-import ProtectedRoute from '@/components/ProtectedRoute';
+import { RouteObject, Navigate } from "react-router-dom";
+import { lazy, Suspense } from "react";
+import { LoadingSpinner } from "@/components/ui";
+import LoadingRoute from "@/components/ui/LoadingRoute";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 // Lazy load Auth components
-const Login = lazy(() => import('@/pages/Auth/Login'));
+const Login = lazy(() => import("@/pages/Auth/Login"));
 
 // Lazy load Admin components
-const AdminDashboard = lazy(() => import('@/pages/Admin/Dashboard'));
-const AdminMajors = lazy(() => import('@/pages/Admin/Majors'));
-const AdminCampus = lazy(() => import('@/pages/Admin/Campus'));
-const AdminAdmissionMethods = lazy(() => import('@/pages/Admin/AdmissionMethods'));
-const AdminFeedbackTemplates = lazy(() => import('@/pages/Admin/FeedbackTemplates'));
+const AdminDashboard = lazy(() => import("@/pages/Admin/Dashboard"));
+const AdminMajors = lazy(() => import("@/pages/Admin/Majors"));
+const AdminCampus = lazy(() => import("@/pages/Admin/Campus"));
+const AdminAdmissionMethods = lazy(
+  () => import("@/pages/Admin/AdmissionMethods")
+);
+const AdminFeedbackTemplates = lazy(
+  () => import("@/pages/Admin/FeedbackTemplates")
+);
 
 // Lazy load Staff components
-const StaffDashboard = lazy(() => import('@/pages/Staff/Dashboard'));
-const StaffAdmissions = lazy(() => import('@/pages/Staff/Admissions'));
-const StaffDormitory = lazy(() => import('@/pages/Staff/Dormitory'));
-const StaffScholarships = lazy(() => import('@/pages/Staff/Scholarships'));
+const StaffDashboard = lazy(() => import("@/pages/Staff/Dashboard"));
+const StaffAdmissions = lazy(() => import("@/pages/Staff/Admissions"));
+const StaffDormitory = lazy(() => import("@/pages/Staff/Dormitory/index"));
+const StaffScholarships = lazy(() => import("@/pages/Staff/Scholarship/index"));
 
 export const routes: RouteObject[] = [
   // Root path - kiểm tra phân quyền và chuyển hướng
   {
-    path: '/',
-    element: <ProtectedRoute>
-      {/* Sẽ được chuyển hướng dựa trên role trong ProtectedRoute */}
-      <div>Redirecting...</div>
-    </ProtectedRoute>,
-    index: true
+    path: "/",
+    element: (
+      <ProtectedRoute>
+        {/* Sẽ được chuyển hướng dựa trên role trong ProtectedRoute */}
+        <div>Redirecting...</div>
+      </ProtectedRoute>
+    ),
+    index: true,
   },
-  
+
   // Auth routes (public)
   {
-    path: 'auth',
+    path: "auth",
     children: [
       {
-        path: 'login',
+        path: "login",
         element: (
           <LoadingRoute minLoadingTime={2500} alwaysShowOnReload={true}>
             <Suspense fallback={<LoadingSpinner fullScreen={true} />}>
@@ -50,12 +56,12 @@ export const routes: RouteObject[] = [
 
   // Admin routes (protected)
   {
-    path: 'admin',
+    path: "admin",
     children: [
       {
-        path: 'dashboard',
+        path: "dashboard",
         element: (
-          <ProtectedRoute allowedRoles={['admin']}>
+          <ProtectedRoute allowedRoles={["admin"]}>
             <Suspense fallback={<LoadingSpinner fullScreen={true} />}>
               <AdminDashboard />
             </Suspense>
@@ -63,9 +69,9 @@ export const routes: RouteObject[] = [
         ),
       },
       {
-        path: 'majors',
+        path: "majors",
         element: (
-          <ProtectedRoute allowedRoles={['admin']}>
+          <ProtectedRoute allowedRoles={["admin"]}>
             <Suspense fallback={<LoadingSpinner fullScreen={true} />}>
               <AdminMajors />
             </Suspense>
@@ -73,9 +79,9 @@ export const routes: RouteObject[] = [
         ),
       },
       {
-        path: 'campus',
+        path: "campus",
         element: (
-          <ProtectedRoute allowedRoles={['admin']}>
+          <ProtectedRoute allowedRoles={["admin"]}>
             <Suspense fallback={<LoadingSpinner fullScreen={true} />}>
               <AdminCampus />
             </Suspense>
@@ -83,9 +89,9 @@ export const routes: RouteObject[] = [
         ),
       },
       {
-        path: 'admission-methods',
+        path: "admission-methods",
         element: (
-          <ProtectedRoute allowedRoles={['admin']}>
+          <ProtectedRoute allowedRoles={["admin"]}>
             <Suspense fallback={<LoadingSpinner fullScreen={true} />}>
               <AdminAdmissionMethods />
             </Suspense>
@@ -93,9 +99,9 @@ export const routes: RouteObject[] = [
         ),
       },
       {
-        path: 'feedback-templates',
+        path: "feedback-templates",
         element: (
-          <ProtectedRoute allowedRoles={['admin']}>
+          <ProtectedRoute allowedRoles={["admin"]}>
             <Suspense fallback={<LoadingSpinner fullScreen={true} />}>
               <AdminFeedbackTemplates />
             </Suspense>
@@ -107,12 +113,12 @@ export const routes: RouteObject[] = [
 
   // Staff routes (protected)
   {
-    path: 'staff',
+    path: "staff",
     children: [
       {
-        path: 'dashboard',
+        path: "dashboard",
         element: (
-          <ProtectedRoute allowedRoles={['staff']}>
+          <ProtectedRoute allowedRoles={["staff"]}>
             <Suspense fallback={<LoadingSpinner fullScreen={true} />}>
               <StaffDashboard />
             </Suspense>
@@ -120,9 +126,9 @@ export const routes: RouteObject[] = [
         ),
       },
       {
-        path: 'admissions',
+        path: "admissions",
         element: (
-          <ProtectedRoute allowedRoles={['staff']}>
+          <ProtectedRoute allowedRoles={["staff"]}>
             <Suspense fallback={<LoadingSpinner fullScreen={true} />}>
               <StaffAdmissions />
             </Suspense>
@@ -130,9 +136,9 @@ export const routes: RouteObject[] = [
         ),
       },
       {
-        path: 'dormitory',
+        path: "dormitory",
         element: (
-          <ProtectedRoute allowedRoles={['staff']}>
+          <ProtectedRoute allowedRoles={["staff"]}>
             <Suspense fallback={<LoadingSpinner fullScreen={true} />}>
               <StaffDormitory />
             </Suspense>
@@ -140,9 +146,9 @@ export const routes: RouteObject[] = [
         ),
       },
       {
-        path: 'scholarships',
+        path: "scholarships",
         element: (
-          <ProtectedRoute allowedRoles={['staff']}>
+          <ProtectedRoute allowedRoles={["staff"]}>
             <Suspense fallback={<LoadingSpinner fullScreen={true} />}>
               <StaffScholarships />
             </Suspense>
@@ -154,7 +160,7 @@ export const routes: RouteObject[] = [
 
   // Chuyển hướng tất cả các đường dẫn không khớp về login
   {
-    path: '*',
-    element: <Navigate to="/auth/login" replace />
+    path: "*",
+    element: <Navigate to="/auth/login" replace />,
   },
-]; 
+];
