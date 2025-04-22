@@ -8,10 +8,10 @@ export const routes: RouteObject[] = [
   {
     path: '/',
     element: <MainLayout />,
-    errorElement: <ErrorBoundaryPage />,
+    // errorElement: <ErrorBoundaryPage />,
     children: [
       homeRoute,
-      notFoundRoute,
+      // notFoundRoute,
     ],
   },
 ]; 

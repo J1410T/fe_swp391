@@ -1,11 +1,16 @@
 import { Outlet } from 'react-router-dom';
+import { SiteHeader } from "@/components/site-header"
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
+import { AppSidebar } from "@/components/app-sidebar"
 
 export const MainLayout = () => {
   return (
-    <div className="min-h-screen flex flex-col">
-      <main className="flex-1 container mx-auto px-4 py-8">
-        <Outlet />
-      </main>
-    </div>
+    <SidebarProvider>
+      <AppSidebar variant="inset" />
+      <SidebarInset>
+        <SiteHeader />
+          <Outlet />
+      </SidebarInset>
+    </SidebarProvider>
   );
 }; 
