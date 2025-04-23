@@ -16,4 +16,7 @@ export const campusesRoute: RouteObject = {
   path: 'campuses',
   element: <Campuses />,
   loader: loadCampusesData,
+  handle: {
+    breadcrumb: "Cơ sở"
+  }
 };

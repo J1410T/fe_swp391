@@ -16,4 +16,7 @@ export const dormitoriesRoute: RouteObject = {
   path: 'dormitories',
   element: <Dormitories />,
   loader: loadDormitoriesData,
+  handle: {
+    breadcrumb: "Ký túc xá"
+  }
 };

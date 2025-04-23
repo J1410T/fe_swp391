@@ -8,4 +8,7 @@ export const admissionMethodsRoute: RouteObject = {
   path: 'admission-methods',
   element: <AdmissionMethods />,
   loader: loadAdmissionMethodsData,
+  handle: {
+    breadcrumb: "Phương thức tuyển sinh"
+  }
 };

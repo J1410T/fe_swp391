@@ -16,4 +16,7 @@ export const scholarshipsRoute: RouteObject = {
   path: 'scholarships',
   element: <Scholarships />,
   loader: loadScholarshipsData,
+  handle: {
+    breadcrumb: "Học bổng"
+  }
 };

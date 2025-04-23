@@ -16,5 +16,7 @@ export const majorsRoute: RouteObject = {
   path: 'majors',
   element: <Majors />,
   loader: loadMajorsData,
-  // Thêm các thuộc tính khác nếu cần (errorElement, handle, etc.)
+  handle: {
+    breadcrumb: "Ngành học"
+  }
 };
