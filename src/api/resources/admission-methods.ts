@@ -2,14 +2,17 @@
  * API cho phương thức tuyển sinh
  */
 
+import { api } from '@/api/base';
 import type { 
   AdmissionMethod,
   ApiResponse, 
-  PaginatedResponse, 
   PaginationParams, 
   FilterParams, 
   SortParams 
 } from '@/types';
+
+// Endpoint cho phương thức tuyển sinh
+const ENDPOINT = '/admission-methods';
 
 /**
  * API cho phương thức tuyển sinh
@@ -22,9 +25,9 @@ export const admissionMethodsApi = {
    */
   getAll: async (
     params?: PaginationParams & SortParams & Partial<FilterParams>
-  ): Promise<ApiResponse<PaginatedResponse<AdmissionMethod>>> => {
-    // TODO: Implement API call to get admission methods
-    return {} as ApiResponse<PaginatedResponse<AdmissionMethod>>;
+  ): Promise<ApiResponse<AdmissionMethod[]>> => {
+    const response = await api.get<ApiResponse<AdmissionMethod[]>>(ENDPOINT, { params });
+    return response;
   },
   
   /**
@@ -33,29 +36,29 @@ export const admissionMethodsApi = {
    * @returns Promise với phương thức tuyển sinh
    */
   getById: async (id: string): Promise<ApiResponse<AdmissionMethod>> => {
-    // TODO: Implement API call to get admission method by ID
-    return {} as ApiResponse<AdmissionMethod>;
+    const response = await api.get<ApiResponse<AdmissionMethod>>(`${ENDPOINT}/${id}`);
+    return response;
   },
   
   /**
    * Tạo phương thức tuyển sinh mới
-   * @param data Dữ liệu phương thức tuyển sinh
+   * @param admissionMethodData Dữ liệu phương thức tuyển sinh
    * @returns Promise với phương thức tuyển sinh đã tạo
    */
-  create: async (data: Omit<AdmissionMethod, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<AdmissionMethod>> => {
-    // TODO: Implement API call to create admission method
-    return {} as ApiResponse<AdmissionMethod>;
+  create: async (admissionMethodData: Omit<AdmissionMethod, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<AdmissionMethod>> => {
+    const response = await api.post<ApiResponse<AdmissionMethod>>(ENDPOINT, admissionMethodData);
+    return response;
   },
   
   /**
    * Cập nhật phương thức tuyển sinh
    * @param id ID của phương thức tuyển sinh
-   * @param data Dữ liệu cập nhật
+   * @param updateData Dữ liệu cập nhật
    * @returns Promise với phương thức tuyển sinh đã cập nhật
    */
-  update: async (id: string, data: Partial<AdmissionMethod>): Promise<ApiResponse<AdmissionMethod>> => {
-    // TODO: Implement API call to update admission method
-    return {} as ApiResponse<AdmissionMethod>;
+  update: async (id: string, updateData: Partial<AdmissionMethod>): Promise<ApiResponse<AdmissionMethod>> => {
+    const response = await api.put<ApiResponse<AdmissionMethod>>(`${ENDPOINT}/${id}`, updateData);
+    return response;
   },
   
   /**
@@ -64,7 +67,7 @@ export const admissionMethodsApi = {
    * @returns Promise void
    */
   delete: async (id: string): Promise<ApiResponse<void>> => {
-    // TODO: Implement API call to delete admission method
-    return {} as ApiResponse<void>;
+    const response = await api.delete<ApiResponse<void>>(`${ENDPOINT}/${id}`);
+    return response;
   }
 };
