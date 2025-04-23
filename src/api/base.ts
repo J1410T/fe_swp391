@@ -14,10 +14,19 @@ export const api = {
    * @param endpoint Endpoint API
    * @returns Promise với dữ liệu
    */
-  async fetch<TData>(endpoint: string): Promise<TData> {
-    // Giả lập delay mạng
-    await new Promise(resolve => setTimeout(resolve, 500));
-    return {} as TData;
+  async fetch<TData>(endpoint: string, options: RequestInit = {}): Promise<TData> {
+    const response = await fetch(endpoint, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return response.json();
   },
   /**
    * Tạo resource cho Suspense
