@@ -10,6 +10,8 @@ import { Loading } from "@/components/common/loading";
 import { ErrorBoundary } from "@/components/common/error-boundary";
 import { toast } from "sonner";
 import { AddAdmissionMethod } from "./AddAdmissionMethod";
+import { EditAdmissionMethod } from "./components/EditAdmissionMethod";
+import { DeleteAdmissionMethod } from "./components/DeleteAdmissionMethod";
 import type { AdmissionMethod } from "@/types";
 
 /**
@@ -20,11 +22,17 @@ function AdmissionMethodsContent(): React.ReactElement {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
+  /**
+   * Lấy danh sách phương thức tuyển sinh và sắp xếp theo ID tăng dần
+   */
   const fetchAdmissionMethods = async () => {
     try {
       setLoading(true);
       const response = await admissionMethodsApi.getAll();
-      setAdmissionMethods(response.data);
+      
+      // Sắp xếp danh sách theo ID tăng dần
+      const sortedData = [...response.data].sort((a, b) => a.id - b.id);
+      setAdmissionMethods(sortedData);
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Lỗi không xác định'));
       toast.error("Không thể tải dữ liệu phương thức tuyển sinh");
@@ -103,15 +111,8 @@ function AdmissionMethodsContent(): React.ReactElement {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
-                          <Button variant="outline" size="sm">
-                            Chi tiết
-                          </Button>
-                          <Button variant="outline" size="sm">
-                            Sửa
-                          </Button>
-                          <Button variant="destructive" size="sm">
-                            Xóa
-                          </Button>
+                          <EditAdmissionMethod method={method} onSuccess={fetchAdmissionMethods} />
+                          <DeleteAdmissionMethod method={method} onSuccess={fetchAdmissionMethods} />
                         </div>
                       </TableCell>
                     </TableRow>
@@ -150,16 +151,9 @@ function AdmissionMethodsContent(): React.ReactElement {
                   </div>
                 </CardContent>
                 <CardFooter className="flex justify-between pt-3 border-t">
-                  <Button variant="outline" size="sm">
-                    Chi tiết
-                  </Button>
                   <div className="flex gap-2">
-                    <Button variant="outline" size="sm">
-                      Sửa
-                    </Button>
-                    <Button variant="destructive" size="sm">
-                      Xóa
-                    </Button>
+                    <EditAdmissionMethod method={method} onSuccess={fetchAdmissionMethods} />
+                    <DeleteAdmissionMethod method={method} onSuccess={fetchAdmissionMethods} />
                   </div>
                 </CardFooter>
               </Card>
