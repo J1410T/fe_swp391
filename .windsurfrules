@@ -1,0 +1,153 @@
+# Comprehensive Development Rules for React & Node.js Applications
+## Using Vietnamese when answer any questions.
+## I. Code Readability & Structure
+
+1. **Early Returns & Code Flow**:
+   - Use early returns to enhance readability and simplify logic
+   - Avoid deeply nested logic, favoring return statements at the earliest exit point
+   - Keep code blocks concise, ideally under 30 lines per function
+
+2. **Naming Conventions**:
+   - Use descriptive names for variables, constants, functions, and components
+   - Apply camelCase for variables and functions (`getUserData`), PascalCase for components (`UserProfile`)
+   - Avoid unclear abbreviations, prioritize clarity over brevity
+   - Name variables according to their purpose, not their data type (`userList` instead of `array`)
+
+3. **Directory Structure**:
+   - Organize code by feature or module, not by file type
+   - Keep related components close to each other
+   - Create separate directories for utilities, hooks, contexts, and services
+
+## II. React Best Practices
+
+1. **Component Design**:
+   - Use functional components over class components
+   - Clearly separate container components (handling logic) from presentational components (UI display)
+   - Keep each component small, focused on a specific function (< 250 lines of code)
+   - Apply the single responsibility principle: each component should do one thing and do it well
+
+2. **State Management**:
+   - Use local state (`useState`) for component-specific state
+   - Apply Context API and useReducer for state shared across nested components
+   - Use Redux only when the application has complex state or needs global state management
+   - Separate business logic from components using custom hooks
+
+3. **Performance Optimization**:
+   - Use React.memo to prevent unnecessary re-renders
+   - Optimize callbacks with useCallback
+   - Optimize complex calculations with useMemo
+   - Use virtualization (react-window, react-virtualized) for long lists
+   - Implement React.lazy and Suspense for code-splitting
+
+4. **Hooks Usage**:
+   - Strictly follow the rules of hooks
+   - Create custom hooks to reuse logic
+   - Avoid overusing useEffect, only use it when synchronizing with external systems
+   - Use dependency arrays in useEffect correctly
+
+## III. Styling & UI
+
+1. **TailwindCSS Implementation**:
+   - Use Tailwind CSS for utility-first styling
+   - Leverage responsive classes (`sm:`, `md:`, `lg:`) to build responsive interfaces
+   - Use pseudo-classes (`hover:`, `focus:`, `active:`) for interactive elements
+   - Create abstract classes with @apply for repeating UI patterns
+   - Use Tailwind config to extend the theme according to your design system
+
+2. **Consistency & Design System**:
+   - Build and adhere to a consistent design system (spacing, colors, typography)
+   - Create a component library for common UI elements
+   - Maintain consistency in layout, spacing, and visual hierarchy
+
+## IV. Accessibility (A11y)
+
+1. **A11y Standards**:
+   - Comply with WCAG 2.1 at AA level
+   - Use semantic HTML elements (`<button>`, `<nav>`, `<article>`) instead of generic divs
+   - Add ARIA attributes and roles when necessary
+   - Ensure appropriate contrast ratio for text
+
+2. **Keyboard Navigation**:
+   - Ensure all interactive elements are accessible via keyboard
+   - Add `tabindex="0"` to custom elements that need keyboard focus
+   - Handle both `onClick` and `onKeyDown` (Enter/Space) for interactive elements
+   - Maintain logical tab order aligned with visual flow
+
+3. **Screen Readers**:
+   - Add `aria-label` and `aria-describedby` to describe elements
+   - Use `aria-live` for dynamic content
+   - Test compatibility with popular screen readers (NVDA, VoiceOver)
+
+## VI. Error Handling
+
+1. **Client-side Errors**:
+   - Implement error boundaries for React components
+   - Handle errors in async functions with try-catch
+   - Display user-friendly error messages
+   - Log detailed errors for developers
+
+2. **API Errors**:
+   - Handle HTTP status codes consistently
+   - Implement retry mechanism for network failures
+   - Provide clear error messages with suggested solutions
+
+## VII. Backend (Node.js + MongoDB)
+
+1. **Architecture**:
+   - Apply the MVC (Model-View-Controller) pattern
+   - Use layered architecture (routes, controllers, services, models)
+   - Separate business logic from the data access layer
+
+2. **Database Design**:
+   - Use Mongoose as the ODM for MongoDB
+   - Design schemas with thorough validation
+   - Implement indexes for frequent queries
+   - Use transactions for complex operations
+
+3. **API Design**:
+   - Follow RESTful principles
+   - Version your APIs (`/api/v1/...`)
+   - Maintain consistent response format
+   - Implement pagination, filtering, and sorting
+   - Use HTTP methods correctly (GET, POST, PUT, DELETE)
+
+4. **Performance**:
+   - Implement caching with Redis for common queries
+   - Optimize database queries and aggregations
+   - Implement rate limiting
+   - Use streaming for large data sets
+
+5. **Security**:
+   - Use JWT authentication with refresh tokens
+   - Use bcrypt for password hashing
+   - Implement authorization middleware
+   - Sanitize input data to prevent injection attacks
+   - Configure CORS appropriately
+   - Use Helmet.js to set security headers
+   - Implement rate limiting to prevent brute force attacks
+
+## VIII. Coding Standards & Process
+
+1. **Linting & Formatting**:
+   - Use ESLint with strict configuration
+   - Use Prettier for code formatting
+   - Implement Husky pre-commit hooks
+   - Use TypeScript for type safety
+
+2. **Git Workflow**:
+   - Use semantic commit messages (`feat:`, `fix:`, `docs:`, `refactor:`)
+   - Apply gitflow or trunk-based development
+   - Require pull requests with code reviews
+   - Squash commits when merging
+
+3. **Documentation**:
+   - Use JSDoc for functions and components
+   - Create clear READMEs with setup instructions
+   - Use Swagger/OpenAPI for API documentation
+   - Implement Storybook for component documentation
+
+4. **DRY Principle**:
+   - Create utility functions for commonly used logic
+   - Abstract shared UI patterns into reusable components
+   - Use constants files for magic values
+   - Create hooks for reusable stateful logic
