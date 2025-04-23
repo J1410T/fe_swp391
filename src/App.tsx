@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, StrictMode } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { router } from './routes';
 import { initializeTheme } from './lib/theme-script';
@@ -14,9 +14,9 @@ function App(): React.ReactElement {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <StrictMode>
       <RouterProvider router={router} />
-    </div>
+    </StrictMode>
   );
 }
 

@@ -20,10 +20,19 @@ export interface AdmissionMethodsData {
 }
 
 /**
+ * Trạng thái của loader
+ */
+export type LoaderStatus = 'idle' | 'loading' | 'success' | 'error';
+
+/**
  * Admission methods loader response type
  */
 export interface AdmissionMethodsLoaderResponse {
-  data: AdmissionMethodsData;
+  /** Danh sách phương thức tuyển sinh */
+  admissionMethods: AdmissionMethod[];
+  /** Trạng thái của request */
+  status: LoaderStatus;
+  /** Thông báo lỗi nếu có */
   error?: string;
 }
 
