@@ -4,7 +4,6 @@
 
 // Base API
 export * from './base';
-export * from './types';
 
 // Resources
 export * from './resources/majors';

@@ -2,8 +2,8 @@
  * API cho majors
  */
 
-import type { Major } from '@/routes/majors/types';
-import type { ApiResponse, PaginatedResponse, PaginationParams, FilterParams, SortParams } from '../types';
+import type { Major } from '@/types/entities/major';
+import type { ApiResponse, PaginatedResponse, PaginationParams, FilterParams, SortParams } from '@/types';
 
 /**
  * API cho majors

@@ -2,8 +2,14 @@
  * API cho ký túc xá
  */
 
-import type { Dormitory } from '@/routes/dormitories/types';
-import type { ApiResponse, PaginatedResponse, PaginationParams, FilterParams, SortParams } from '../types';
+import type { 
+  Dormitory,
+  ApiResponse, 
+  PaginatedResponse, 
+  PaginationParams, 
+  FilterParams, 
+  SortParams 
+} from '@/types';
 
 /**
  * API cho ký túc xá

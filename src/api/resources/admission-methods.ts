@@ -2,8 +2,14 @@
  * API cho phương thức tuyển sinh
  */
 
-import type { AdmissionMethod } from '@/routes/admission-methods/types';
-import type { ApiResponse, PaginatedResponse, PaginationParams, FilterParams, SortParams } from '../types';
+import type { 
+  AdmissionMethod,
+  ApiResponse, 
+  PaginatedResponse, 
+  PaginationParams, 
+  FilterParams, 
+  SortParams 
+} from '@/types';
 
 /**
  * API cho phương thức tuyển sinh

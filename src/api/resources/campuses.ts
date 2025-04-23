@@ -2,8 +2,14 @@
  * API cho campus
  */
 
-import type { Campus } from '@/routes/campuses/types';
-import type { ApiResponse, PaginatedResponse, PaginationParams, FilterParams, SortParams } from '../types';
+import type { 
+  Campus,
+  ApiResponse, 
+  PaginatedResponse, 
+  PaginationParams, 
+  FilterParams, 
+  SortParams 
+} from '@/types';
 
 /**
  * API cho campus

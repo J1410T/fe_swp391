@@ -2,8 +2,14 @@
  * API cho học bổng
  */
 
-import type { Scholarship } from '@/routes/scholarships/types';
-import type { ApiResponse, PaginatedResponse, PaginationParams, FilterParams, SortParams } from '../types';
+import type { 
+  Scholarship,
+  ApiResponse, 
+  PaginatedResponse, 
+  PaginationParams, 
+  FilterParams, 
+  SortParams 
+} from '@/types';
 
 /**
  * API cho học bổng
