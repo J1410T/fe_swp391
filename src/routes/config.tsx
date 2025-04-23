@@ -1,5 +1,6 @@
 import { RouteObject } from 'react-router-dom';
 import { MainLayout } from '@/layouts/MainLayout';
+import { AuthLayout } from '@/layouts/AuthLayout';
 import { ErrorBoundaryPage } from '@/pages/ErrorBoundaryPage';
 import { notFoundRoute } from '@/routes/not-found';
 import { dashboardRoute } from '@/routes/dashboard';
@@ -8,6 +9,7 @@ import { admissionMethodsRoute } from '@/routes/admission-methods';
 import { campusesRoute } from '@/routes/campuses';
 import { scholarshipsRoute } from '@/routes/scholarships';
 import { dormitoriesRoute } from '@/routes/dormitories';
+import { loginRoute } from '@/routes/auth/login';
 
 import { Navigate } from 'react-router-dom';
 
@@ -31,6 +33,13 @@ export const routes: RouteObject[] = [
       scholarshipsRoute,
       dormitoriesRoute,
       notFoundRoute,
+    ],
+  },
+  {
+    path: '/auth',
+    element: <AuthLayout />,
+    children: [
+      loginRoute,
     ],
   },
 ]; 

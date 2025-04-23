@@ -97,27 +97,26 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="offcanvas" {...props}>
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              className="data-[slot=sidebar-menu-button]:!p-1.5"
-            >
-              <Link to="/" className="flex items-center gap-2">
-                <img src="/src/assets/images/logo.svg" alt="FPT University" className="h-8 w-auto" />
-                <span className="text-base font-semibold">FPTU Admissions</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+      <SidebarHeader className="py-6 border-b border-border/40">
+        <div className="flex justify-center">
+          <Link to="/" className="block">
+            <div className="flex flex-col items-center space-y-2">
+              <img 
+                src="/src/assets/images/logo.svg" 
+                alt="FPT University" 
+                className="h-12 w-auto" 
+              />
+              <div className="text-sm font-medium text-primary">Admissions</div>
+            </div>
+          </Link>
+        </div>
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <div className="flex items-center justify-between px-4">
+        <div className="flex items-center justify-between">
           <NavUser user={data.user} />
         </div>
       </SidebarFooter>
