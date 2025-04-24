@@ -29,6 +29,22 @@ export interface Dormitory {
 }
 
 /**
+ * Response từ API cho ký túc xá
+ */
+export interface DormitoryResponse {
+  id: number;
+  campus_id: number;
+  name: string;
+  description: string;
+  capacity: number;
+  campus: {
+    id: number;
+    name: string;
+    address: string;
+  };
+}
+
+/**
  * Dữ liệu tạo mới ký túc xá
  */
 export interface DormitoryCreateData {

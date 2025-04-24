@@ -2,14 +2,9 @@
  * API cho ký túc xá
  */
 
-import type { 
-  Dormitory,
-  ApiResponse, 
-  PaginatedResponse, 
-  PaginationParams, 
-  FilterParams, 
-  SortParams 
-} from '@/types';
+import { api } from '../base';
+import type { ApiResponse } from '@/types';
+import type { DormitoryResponse } from '@/types/entities/dormitory';
 
 /**
  * API cho ký túc xá
@@ -17,14 +12,10 @@ import type {
 export const dormitoriesApi = {
   /**
    * Lấy danh sách ký túc xá
-   * @param params Params cho phân trang, sắp xếp và lọc
    * @returns Promise với danh sách ký túc xá
    */
-  getAll: async (
-    params?: PaginationParams & SortParams & Partial<FilterParams>
-  ): Promise<ApiResponse<PaginatedResponse<Dormitory>>> => {
-    // TODO: Implement API call to get dormitories
-    return {} as ApiResponse<PaginatedResponse<Dormitory>>;
+  getAll: async (): Promise<ApiResponse<DormitoryResponse[]>> => {
+    return api.get<ApiResponse<DormitoryResponse[]>>('/dormitories');
   },
   
   /**
@@ -32,9 +23,8 @@ export const dormitoriesApi = {
    * @param id ID của ký túc xá
    * @returns Promise với ký túc xá
    */
-  getById: async (id: string): Promise<ApiResponse<Dormitory>> => {
-    // TODO: Implement API call to get dormitory by ID
-    return {} as ApiResponse<Dormitory>;
+  getById: async (id: number): Promise<ApiResponse<DormitoryResponse>> => {
+    return api.get<ApiResponse<DormitoryResponse>>(`/dormitories/${id}`);
   },
   
   /**
@@ -42,9 +32,8 @@ export const dormitoriesApi = {
    * @param data Dữ liệu ký túc xá
    * @returns Promise với ký túc xá đã tạo
    */
-  create: async (data: Omit<Dormitory, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<Dormitory>> => {
-    // TODO: Implement API call to create dormitory
-    return {} as ApiResponse<Dormitory>;
+  create: async (data: Omit<DormitoryResponse, 'id' | 'campus'>): Promise<ApiResponse<DormitoryResponse>> => {
+    return api.post<ApiResponse<DormitoryResponse>>('/dormitories', data);
   },
   
   /**
@@ -53,9 +42,8 @@ export const dormitoriesApi = {
    * @param data Dữ liệu cập nhật
    * @returns Promise với ký túc xá đã cập nhật
    */
-  update: async (id: string, data: Partial<Dormitory>): Promise<ApiResponse<Dormitory>> => {
-    // TODO: Implement API call to update dormitory
-    return {} as ApiResponse<Dormitory>;
+  update: async (id: number, data: Partial<Omit<DormitoryResponse, 'id' | 'campus'>>): Promise<ApiResponse<DormitoryResponse>> => {
+    return api.put<ApiResponse<DormitoryResponse>>(`/dormitories/${id}`, data);
   },
   
   /**
@@ -63,8 +51,7 @@ export const dormitoriesApi = {
    * @param id ID của ký túc xá
    * @returns Promise void
    */
-  delete: async (id: string): Promise<ApiResponse<void>> => {
-    // TODO: Implement API call to delete dormitory
-    return {} as ApiResponse<void>;
+  delete: async (id: number): Promise<ApiResponse<void>> => {
+    return api.delete<ApiResponse<void>>(`/dormitories/${id}`);
   }
 };

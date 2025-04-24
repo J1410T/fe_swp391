@@ -1,6 +1,5 @@
 import { useState, useEffect, Suspense } from "react";
 import { admissionMethodsApi } from "@/api/resources/admission-methods";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";

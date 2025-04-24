@@ -41,7 +41,7 @@ export function DeleteSuccessScreen({
       >
         <h3 className="text-xl font-bold text-gray-800">Xóa thành công!</h3>
         <p className="text-gray-600">
-          Phương thức tuyển sinh <span className="font-semibold text-red-600">{deletedMethod?.name}</span> đã được xóa khỏi hệ thống.
+          Phương thức tuyển sinh <span className="font-semibold text-red-600">{deletedMethod?.name}</span> <br />Đã được <span className="font-semibold text-red-400">xóa</span> khỏi hệ thống.
         </p>
       </motion.div>
       
@@ -60,6 +60,14 @@ export function DeleteSuccessScreen({
           <li className="flex items-start">
             <span className="text-gray-500 w-24 flex-shrink-0">Tên:</span>
             <span className="font-medium text-gray-800">{deletedMethod?.name}</span>
+          </li>
+          <li className="flex items-start">
+            <span className="text-gray-500 w-24 flex-shrink-0">Mô tả:</span>
+            <span className="font-medium text-gray-800">{deletedMethod?.description}</span>
+          </li>
+          <li className="flex items-start">
+            <span className="text-gray-500 w-24 flex-shrink-0">URL:</span>
+            <span className="font-medium text-gray-800">{deletedMethod?.application_url}</span>
           </li>
         </ul>
       </motion.div>

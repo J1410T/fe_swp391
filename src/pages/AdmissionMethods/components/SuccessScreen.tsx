@@ -41,7 +41,7 @@ export function SuccessScreen({
       >
         <h3 className="text-xl font-bold text-gray-800">Thêm thành công!</h3>
         <p className="text-gray-600">
-          Phương thức tuyển sinh <span className="font-semibold text-orange-600">{addedMethod?.name}</span> đã được thêm vào hệ thống.
+          Phương thức tuyển sinh <span className="font-semibold text-orange-600">{addedMethod?.name}</span> <br />Đã được thêm vào hệ thống!!!
         </p>
       </motion.div>
       

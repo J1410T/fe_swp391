@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { admissionMethodsApi } from "@/api/resources/admission-methods";
 import { toast } from "sonner";
 import type { AdmissionMethod } from "@/types";

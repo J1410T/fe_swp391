@@ -1,10 +1,11 @@
 import type { BaseLoaderResponse } from '../common';
 import type { Major } from '../entities/major';
+import type { PaginatedResponse } from '../api';
 
 /**
  * Response từ loader cho majors
  */
-export interface MajorsLoaderResponse extends BaseLoaderResponse<Major[]> {
+export interface MajorsLoaderResponse extends BaseLoaderResponse<PaginatedResponse<Major>> {
   // Có thể thêm các trường đặc biệt nếu cần
 }
 
