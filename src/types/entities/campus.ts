@@ -21,6 +21,15 @@ export interface Campus {
 }
 
 /**
+ * Response từ API cho cơ sở đào tạo
+ */
+export interface CampusResponse {
+  id: number;
+  name: string;
+  address: string;
+}
+
+/**
  * Dữ liệu tạo mới cơ sở
  */
 export interface CampusCreateData {

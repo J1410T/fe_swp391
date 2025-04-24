@@ -1,70 +1,57 @@
 /**
- * API cho campus
+ * API cho cơ sở đào tạo (campus)
  */
 
-import type { 
-  Campus,
-  ApiResponse, 
-  PaginatedResponse, 
-  PaginationParams, 
-  FilterParams, 
-  SortParams 
-} from '@/types';
+import { api } from '../base';
+import type { ApiResponse } from '@/types';
+import type { CampusResponse } from '@/types/entities/campus';
 
 /**
- * API cho campus
+ * API cho cơ sở đào tạo
  */
 export const campusesApi = {
   /**
-   * Lấy danh sách campus
-   * @param params Params cho phân trang, sắp xếp và lọc
-   * @returns Promise với danh sách campus
+   * Lấy danh sách cơ sở đào tạo
+   * @returns Promise với danh sách cơ sở đào tạo
    */
-  getAll: async (
-    params?: PaginationParams & SortParams & Partial<FilterParams>
-  ): Promise<ApiResponse<PaginatedResponse<Campus>>> => {
-    // TODO: Implement API call to get campuses
-    return {} as ApiResponse<PaginatedResponse<Campus>>;
+  getAll: async (): Promise<ApiResponse<CampusResponse[]>> => {
+    return api.get<ApiResponse<CampusResponse[]>>('/campuses');
   },
   
   /**
-   * Lấy campus theo ID
-   * @param id ID của campus
-   * @returns Promise với campus
+   * Lấy cơ sở đào tạo theo ID
+   * @param id ID của cơ sở đào tạo
+   * @returns Promise với cơ sở đào tạo
    */
-  getById: async (id: string): Promise<ApiResponse<Campus>> => {
-    // TODO: Implement API call to get campus by ID
-    return {} as ApiResponse<Campus>;
+  getById: async (id: number): Promise<ApiResponse<CampusResponse>> => {
+    return api.get<ApiResponse<CampusResponse>>(`/campuses/${id}`);
   },
   
   /**
-   * Tạo campus mới
-   * @param data Dữ liệu campus
-   * @returns Promise với campus đã tạo
+   * Tạo cơ sở đào tạo mới
+   * @param data Dữ liệu cơ sở đào tạo
+   * @returns Promise với cơ sở đào tạo đã tạo
    */
-  create: async (data: Omit<Campus, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<Campus>> => {
-    // TODO: Implement API call to create campus
-    return {} as ApiResponse<Campus>;
+  create: async (data: Omit<CampusResponse, 'id'>): Promise<ApiResponse<CampusResponse>> => {
+    return api.post<ApiResponse<CampusResponse>>('/campuses', data);
   },
   
   /**
-   * Cập nhật campus
-   * @param id ID của campus
+   * Cập nhật cơ sở đào tạo
+   * @param id ID của cơ sở đào tạo
    * @param data Dữ liệu cập nhật
-   * @returns Promise với campus đã cập nhật
+   * @returns Promise với cơ sở đào tạo đã cập nhật
    */
-  update: async (id: string, data: Partial<Campus>): Promise<ApiResponse<Campus>> => {
-    // TODO: Implement API call to update campus
-    return {} as ApiResponse<Campus>;
+  update: async (id: number, data: Partial<Omit<CampusResponse, 'id'>>): Promise<ApiResponse<CampusResponse>> => {
+    return api.put<ApiResponse<CampusResponse>>(`/campuses/${id}`, data);
   },
   
   /**
-   * Xóa campus
-   * @param id ID của campus
+   * Xóa cơ sở đào tạo
+   * @param id ID của cơ sở đào tạo
    * @returns Promise void
    */
-  delete: async (id: string): Promise<ApiResponse<void>> => {
-    // TODO: Implement API call to delete campus
-    return {} as ApiResponse<void>;
+  delete: async (id: number): Promise<ApiResponse<void>> => {
+    return api.delete<ApiResponse<void>>(`/campuses/${id}`);
   }
 };

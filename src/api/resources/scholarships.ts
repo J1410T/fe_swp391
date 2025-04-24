@@ -2,14 +2,9 @@
  * API cho học bổng
  */
 
-import type { 
-  Scholarship,
-  ApiResponse, 
-  PaginatedResponse, 
-  PaginationParams, 
-  FilterParams, 
-  SortParams 
-} from '@/types';
+import { api } from '../base';
+import type { ApiResponse } from '@/types';
+import type { ScholarshipResponse } from '@/types/entities/scholarship';
 
 /**
  * API cho học bổng
@@ -17,14 +12,10 @@ import type {
 export const scholarshipsApi = {
   /**
    * Lấy danh sách học bổng
-   * @param params Params cho phân trang, sắp xếp và lọc
    * @returns Promise với danh sách học bổng
    */
-  getAll: async (
-    params?: PaginationParams & SortParams & Partial<FilterParams>
-  ): Promise<ApiResponse<PaginatedResponse<Scholarship>>> => {
-    // TODO: Implement API call to get scholarships
-    return {} as ApiResponse<PaginatedResponse<Scholarship>>;
+  getAll: async (): Promise<ApiResponse<ScholarshipResponse[]>> => {
+    return api.get<ApiResponse<ScholarshipResponse[]>>('/scholarships');
   },
   
   /**
@@ -32,9 +23,8 @@ export const scholarshipsApi = {
    * @param id ID của học bổng
    * @returns Promise với học bổng
    */
-  getById: async (id: string): Promise<ApiResponse<Scholarship>> => {
-    // TODO: Implement API call to get scholarship by ID
-    return {} as ApiResponse<Scholarship>;
+  getById: async (id: number): Promise<ApiResponse<ScholarshipResponse>> => {
+    return api.get<ApiResponse<ScholarshipResponse>>(`/scholarships/${id}`);
   },
   
   /**
@@ -42,9 +32,8 @@ export const scholarshipsApi = {
    * @param data Dữ liệu học bổng
    * @returns Promise với học bổng đã tạo
    */
-  create: async (data: Omit<Scholarship, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<Scholarship>> => {
-    // TODO: Implement API call to create scholarship
-    return {} as ApiResponse<Scholarship>;
+  create: async (data: Omit<ScholarshipResponse, 'id' | 'major' | 'campus'>): Promise<ApiResponse<ScholarshipResponse>> => {
+    return api.post<ApiResponse<ScholarshipResponse>>('/scholarships', data);
   },
   
   /**
@@ -53,9 +42,8 @@ export const scholarshipsApi = {
    * @param data Dữ liệu cập nhật
    * @returns Promise với học bổng đã cập nhật
    */
-  update: async (id: string, data: Partial<Scholarship>): Promise<ApiResponse<Scholarship>> => {
-    // TODO: Implement API call to update scholarship
-    return {} as ApiResponse<Scholarship>;
+  update: async (id: number, data: Partial<Omit<ScholarshipResponse, 'id' | 'major' | 'campus'>>): Promise<ApiResponse<ScholarshipResponse>> => {
+    return api.put<ApiResponse<ScholarshipResponse>>(`/scholarships/${id}`, data);
   },
   
   /**
@@ -63,8 +51,7 @@ export const scholarshipsApi = {
    * @param id ID của học bổng
    * @returns Promise void
    */
-  delete: async (id: string): Promise<ApiResponse<void>> => {
-    // TODO: Implement API call to delete scholarship
-    return {} as ApiResponse<void>;
+  delete: async (id: number): Promise<ApiResponse<void>> => {
+    return api.delete<ApiResponse<void>>(`/scholarships/${id}`);
   }
 };

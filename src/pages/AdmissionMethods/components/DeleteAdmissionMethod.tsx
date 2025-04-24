@@ -96,7 +96,8 @@ export function DeleteAdmissionMethod({ method, onSuccess }: DeleteAdmissionMeth
                 Xác nhận xóa
               </AlertDialog.Title>
               <AlertDialog.Description className="mt-3 text-gray-600">
-                Bạn có chắc chắn muốn xóa phương thức tuyển sinh <span className="font-semibold text-gray-900">"{method.name}"</span>? Hành động này không thể hoàn tác.
+                Bạn có chắc chắn muốn xóa phương thức tuyển sinh <span className="font-semibold text-gray-900">"{method.name}"</span>? 
+                <p className="mt-2">Hành động này <span className="font-semibold text-red-600">không thể hoàn tác</span>.</p>
               </AlertDialog.Description>
               <div className="mt-6 flex justify-end space-x-3">
                 <AlertDialog.Cancel asChild>
