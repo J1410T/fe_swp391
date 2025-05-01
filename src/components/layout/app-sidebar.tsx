@@ -1,27 +1,26 @@
-import * as React from "react"
-import { Link } from "react-router-dom"
+import * as React from "react";
+import { Link } from "react-router-dom";
 import {
-  IconBuildingCommunity,
+  // IconBuildingCommunity,
   IconBuildingSkyscraper,
   IconCertificate,
   IconDashboard,
   IconSchool,
-  IconSettings,
-  IconUser,
-  IconHistory,
-  IconHelp,
-} from "@tabler/icons-react"
-
+  // IconSettings,
+  // IconUser,
+  // IconHistory,
+  // IconHelp,
+} from "@tabler/icons-react";
 
 import { NavMain } from "@/components/layout/nav-main";
-import { NavSecondary } from "@/components/layout/nav-secondary";
+// import { NavSecondary } from "@/components/layout/nav-secondary";
 import { NavUser } from "@/components/layout/nav-user";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
 /**
  * Data for the sidebar navigation
@@ -44,7 +43,7 @@ const data = {
       icon: IconSchool,
     },
     {
-      title: "Phương thức tuyển sinh",
+      title: "Kế hoạch tuyển sinh",
       url: "/admission-methods",
       icon: IconCertificate,
     },
@@ -58,35 +57,35 @@ const data = {
       url: "/scholarships",
       icon: IconCertificate,
     },
-    {
-      title: "Ký túc xá",
-      url: "/dormitories",
-      icon: IconBuildingCommunity,
-    },
-    {
-      title: "Quản lý người dùng",
-      url: "/users",
-      icon: IconUser,
-    },
-    {
-      title: "Phiên chatbot",
-      url: "/chatbot-sessions",
-      icon: IconHistory,
-    },
+    // {
+    //   title: "Ký túc xá",
+    //   url: "/dormitories",
+    //   icon: IconBuildingCommunity,
+    // },
+    // {
+    //   title: "Quản lý người dùng",
+    //   url: "/users",
+    //   icon: IconUser,
+    // },
+    // {
+    //   title: "Phiên chatbot",
+    //   url: "/chatbot-sessions",
+    //   icon: IconHistory,
+    // },
   ],
-  navSecondary: [
-    {
-      title: "Cài đặt",
-      url: "/settings",
-      icon: IconSettings,
-    },
-    {
-      title: "Trợ giúp",
-      url: "/help",
-      icon: IconHelp,
-    },
-  ],
-}
+  // navSecondary: [
+  //   {
+  //     title: "Cài đặt",
+  //     url: "/settings",
+  //     icon: IconSettings,
+  //   },
+  //   {
+  //     title: "Trợ giúp",
+  //     url: "/help",
+  //     icon: IconHelp,
+  //   },
+  // ],
+};
 
 /**
  * AppSidebar component for the FPTU Admissions Admin Dashboard
@@ -98,10 +97,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <div className="flex justify-center">
           <Link to="/" className="block">
             <div className="flex flex-col items-center space-y-2">
-              <img 
-                src="/src/assets/images/logo.svg" 
-                alt="FPT University" 
-                className="h-12 w-auto" 
+              <img
+                src="/src/assets/images/logo.svg"
+                alt="FPT University"
+                className="h-12 w-auto"
               />
               <div className="text-sm font-medium text-primary">Admissions</div>
             </div>
@@ -110,7 +109,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
       </SidebarContent>
       <SidebarFooter>
         <div className="flex items-center justify-between">
@@ -118,5 +117,5 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </div>
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }

@@ -1,7 +1,22 @@
 import { useState, useEffect, Suspense } from "react";
 import { admissionMethodsApi } from "@/api/resources/admission-methods";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
@@ -12,12 +27,24 @@ import { AddAdmissionMethod } from "./AddAdmissionMethod";
 import { EditAdmissionMethod } from "./components/EditAdmissionMethod";
 import { DeleteAdmissionMethod } from "./components/DeleteAdmissionMethod";
 import type { AdmissionMethod } from "@/types";
+// import {
+//   Dialog,
+//   DialogContent,
+//   DialogDescription,
+//   DialogFooter,
+//   DialogHeader,
+//   DialogTitle,
+//   DialogTrigger,
+// } from "@/components/ui/dialog";
+// import { Button } from "@/components/ui/button";
 
 /**
  * Component nội dung của trang AdmissionMethods
  */
 function AdmissionMethodsContent(): React.ReactElement {
-  const [admissionMethods, setAdmissionMethods] = useState<AdmissionMethod[]>([]);
+  const [admissionMethods, setAdmissionMethods] = useState<AdmissionMethod[]>(
+    []
+  );
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -28,12 +55,12 @@ function AdmissionMethodsContent(): React.ReactElement {
     try {
       setLoading(true);
       const response = await admissionMethodsApi.getAll();
-      
+
       // Sắp xếp danh sách theo ID tăng dần
       const sortedData = [...response.data].sort((a, b) => a.id - b.id);
       setAdmissionMethods(sortedData);
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('Lỗi không xác định'));
+      setError(err instanceof Error ? err : new Error("Lỗi không xác định"));
       toast.error("Không thể tải dữ liệu phương thức tuyển sinh");
     } finally {
       setLoading(false);
@@ -43,6 +70,24 @@ function AdmissionMethodsContent(): React.ReactElement {
   useEffect(() => {
     fetchAdmissionMethods();
   }, []);
+
+  // const fetchAdmissionMethodsByAcademicYear = async () => {
+  //   try {
+  //     // Lấy phương thức tuyển sinh cho năm 2025
+  //     const response = await admissionMethodsApi.getByAcademicYear("2025");
+  //     const sortedData = [...response.data].sort((a, b) => a.id - b.id);
+  //     setAdmissionMethods(sortedData);
+  //   } catch (err) {
+  //     setError(err instanceof Error ? err : new Error("Lỗi không xác định"));
+  //     toast.error("Không thể tải dữ liệu phương thức tuyển sinh");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   fetchAdmissionMethods();
+  // }, []);
 
   if (loading) {
     return <Loading />;
@@ -55,30 +100,36 @@ function AdmissionMethodsContent(): React.ReactElement {
       </div>
     );
   }
-  
+
   return (
     <div className="container mx-auto py-10 space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Phương thức tuyển sinh</h1>
-          <p className="text-muted-foreground">Quản lý các phương thức tuyển sinh của trường</p>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Phương thức tuyển sinh
+          </h1>
+          <p className="text-muted-foreground">
+            Quản lý các phương thức tuyển sinh của trường
+          </p>
         </div>
         <AddAdmissionMethod onSuccess={fetchAdmissionMethods} />
       </div>
-      
+
       <Separator />
-      
+
       <Tabs defaultValue="table" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="table">Bảng</TabsTrigger>
           <TabsTrigger value="cards">Thẻ</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="table" className="mt-6">
           <Card>
             <CardHeader>
               <CardTitle>Danh sách phương thức tuyển sinh</CardTitle>
-              <CardDescription>Tất cả các phương thức tuyển sinh hiện có trong hệ thống</CardDescription>
+              <CardDescription>
+                Tất cả các phương thức tuyển sinh hiện có trong hệ thống
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
@@ -99,9 +150,9 @@ function AdmissionMethodsContent(): React.ReactElement {
                       <TableCell>{method.name}</TableCell>
                       <TableCell>{method.description}</TableCell>
                       <TableCell>
-                        <a 
-                          href={method.application_url} 
-                          target="_blank" 
+                        <a
+                          href={method.application_url}
+                          target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-500 hover:underline"
                         >
@@ -110,8 +161,14 @@ function AdmissionMethodsContent(): React.ReactElement {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
-                          <EditAdmissionMethod method={method} onSuccess={fetchAdmissionMethods} />
-                          <DeleteAdmissionMethod method={method} onSuccess={fetchAdmissionMethods} />
+                          <EditAdmissionMethod
+                            method={method}
+                            onSuccess={fetchAdmissionMethods}
+                          />
+                          <DeleteAdmissionMethod
+                            method={method}
+                            onSuccess={fetchAdmissionMethods}
+                          />
                         </div>
                       </TableCell>
                     </TableRow>
@@ -121,26 +178,32 @@ function AdmissionMethodsContent(): React.ReactElement {
             </CardContent>
           </Card>
         </TabsContent>
-        
+
         <TabsContent value="cards" className="mt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {admissionMethods.map((method) => (
               <Card key={method.id} className="overflow-hidden">
                 <CardHeader className="pb-3">
                   <CardTitle>{method.name}</CardTitle>
-                  <CardDescription className="line-clamp-2">{method.description}</CardDescription>
+                  <CardDescription className="line-clamp-2">
+                    {method.description}
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
                     <div className="flex items-center">
                       <span className="text-muted-foreground text-sm">ID:</span>
-                      <Badge variant="outline" className="ml-2">{method.id}</Badge>
+                      <Badge variant="outline" className="ml-2">
+                        {method.id}
+                      </Badge>
                     </div>
                     <div>
-                      <span className="text-muted-foreground text-sm">URL đăng ký:</span>
-                      <a 
-                        href={method.application_url} 
-                        target="_blank" 
+                      <span className="text-muted-foreground text-sm">
+                        URL đăng ký:
+                      </span>
+                      <a
+                        href={method.application_url}
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="ml-2 text-blue-500 hover:underline text-sm"
                       >
@@ -151,8 +214,14 @@ function AdmissionMethodsContent(): React.ReactElement {
                 </CardContent>
                 <CardFooter className="flex justify-between pt-3 border-t">
                   <div className="flex gap-2">
-                    <EditAdmissionMethod method={method} onSuccess={fetchAdmissionMethods} />
-                    <DeleteAdmissionMethod method={method} onSuccess={fetchAdmissionMethods} />
+                    <EditAdmissionMethod
+                      method={method}
+                      onSuccess={fetchAdmissionMethods}
+                    />
+                    <DeleteAdmissionMethod
+                      method={method}
+                      onSuccess={fetchAdmissionMethods}
+                    />
                   </div>
                 </CardFooter>
               </Card>
@@ -160,6 +229,120 @@ function AdmissionMethodsContent(): React.ReactElement {
           </div>
         </TabsContent>
       </Tabs>
+      {/* <TabsContent value="cards" className="mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {admissionMethods.map((method) => (
+            <Card
+              key={method.id}
+              className="overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer"
+            >
+              <Dialog>
+                <DialogTrigger asChild>
+                  <CardHeader className="pb-3">
+                    <CardTitle>{method.name}</CardTitle>
+                    <CardDescription className="line-clamp-2">
+                      {method.description}
+                    </CardDescription>
+                  </CardHeader>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[625px]">
+                  <DialogHeader>
+                    <DialogTitle>{method.name}</DialogTitle>
+                    <DialogDescription>
+                      Chi tiết phương thức tuyển sinh
+                    </DialogDescription>
+                  </DialogHeader>
+
+                  <div className="grid gap-4 py-4">
+                    <div>
+                      <h4 className="text-lg font-semibold mb-2">
+                        Thông Tin Chi Tiết
+                      </h4>
+                      <div className="space-y-2">
+                        <p>
+                          <span className="font-medium">Mã Phương Thức:</span>{" "}
+                          {method.code || "Chưa cập nhật"}
+                        </p>
+                        <p>
+                          <span className="font-medium">Năm Học:</span>{" "}
+                          {method.academicYear || "Chưa xác định"}
+                        </p>
+                        <p>
+                          <span className="font-medium">URL Đăng Ký:</span>
+                          <a
+                            href={method.application_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="ml-2 text-blue-500 hover:underline"
+                          >
+                            {method.application_url}
+                          </a>
+                        </p>
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    <div>
+                      <h4 className="text-lg font-semibold mb-2">
+                        Mô Tả Chi Tiết
+                      </h4>
+                      <p>{method.description}</p>
+                    </div>
+                  </div>
+
+                  <DialogFooter>
+                    <Button
+                      variant="outline"
+                      onClick={() =>
+                        window.open(method.application_url, "_blank")
+                      }
+                    >
+                      Đăng Ký Ngay
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="flex items-center">
+                    <span className="text-muted-foreground text-sm">ID:</span>
+                    <Badge variant="outline" className="ml-2">
+                      {method.id}
+                    </Badge>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground text-sm">
+                      URL đăng ký:
+                    </span>
+                    <a
+                      href={method.application_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="ml-2 text-blue-500 hover:underline text-sm"
+                    >
+                      {method.application_url}
+                    </a>
+                  </div>
+                </div>
+              </CardContent>
+              <CardFooter className="flex justify-between pt-3 border-t">
+                <div className="flex gap-2">
+                  <EditAdmissionMethod
+                    method={method}
+                    onSuccess={fetchAdmissionMethodsByAcademicYear}
+                  />
+                  <DeleteAdmissionMethod
+                    method={method}
+                    onSuccess={fetchAdmissionMethodsByAcademicYear}
+                  />
+                </div>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+      </TabsContent> */}
     </div>
   );
 }

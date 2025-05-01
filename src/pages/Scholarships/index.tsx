@@ -3,7 +3,10 @@ import { useLoaderData } from "react-router-dom";
 import { Loading } from "@/components/common/loading";
 import { ErrorBoundary } from "@/components/common/error-boundary";
 import type { ScholarshipsLoaderResponse } from "@/types/loaders/scholarship";
-import { scholarshipsApi, type ScholarshipResponse } from "@/api/resources/scholarships";
+import {
+  scholarshipsApi,
+  type ScholarshipResponse,
+} from "@/api/resources/scholarships";
 import {
   Card,
   CardContent,
@@ -31,7 +34,7 @@ import { Separator } from "@/components/ui/separator";
 function ScholarshipsContent(): React.ReactElement {
   // Lấy dữ liệu từ loader
   useLoaderData<ScholarshipsLoaderResponse>();
-  
+
   const [scholarships, setScholarships] = useState<ScholarshipResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -65,10 +68,10 @@ function ScholarshipsContent(): React.ReactElement {
 
   // Hàm định dạng tiền tệ
   const formatCurrency = (amount: number): string => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND',
-      maximumFractionDigits: 0
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+      maximumFractionDigits: 0,
     }).format(amount);
   };
 
@@ -90,37 +93,56 @@ function ScholarshipsContent(): React.ReactElement {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {scholarships.map((scholarship) => (
-          <Card key={scholarship.id} className="overflow-hidden hover:shadow-md transition-shadow">
+          <Card
+            key={scholarship.id}
+            className="overflow-hidden hover:shadow-md transition-shadow"
+          >
             <CardHeader className="bg-gradient-to-r from-orange-50 to-amber-50">
-              <CardTitle className="text-lg font-semibold">{scholarship.name}</CardTitle>
+              <CardTitle className="text-lg font-semibold">
+                {scholarship.name}
+              </CardTitle>
               <CardDescription>
-                {scholarship.campus ? scholarship.campus.name : "Tất cả cơ sở"} • 
-                {scholarship.major ? scholarship.major.name : "Tất cả ngành học"}
+                {scholarship.campus ? scholarship.campus.name : "Tất cả cơ sở"}{" "}
+                •
+                {scholarship.major
+                  ? scholarship.major.name
+                  : "Tất cả ngành học"}
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-6">
               <div className="space-y-3">
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Mô tả:</span>
+                  <span className="text-sm font-medium text-gray-500">
+                    Mô tả:
+                  </span>
                   <p className="mt-1">{scholarship.description}</p>
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Điều kiện:</span>
+                  <span className="text-sm font-medium text-gray-500">
+                    Điều kiện:
+                  </span>
                   <p className="mt-1">{scholarship.condition}</p>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-gray-500">Giá trị:</span>
-                  <Badge variant="outline" className="border-orange-400 text-orange-700 font-semibold">
+                  <span className="text-sm font-medium text-gray-500">
+                    Giá trị:
+                  </span>
+                  <Badge
+                    variant="outline"
+                    className="border-orange-400 text-orange-700 font-semibold"
+                  >
                     {formatCurrency(scholarship.amount)}
                   </Badge>
                 </div>
               </div>
             </CardContent>
             <CardFooter className="flex justify-between border-t pt-4 bg-gray-50">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="text-gray-700 border-gray-300 hover:bg-gray-100"
-                onClick={() => window.open(scholarship.application_url, '_blank')}
+                onClick={() =>
+                  window.open(scholarship.application_url, "_blank")
+                }
               >
                 Link đăng ký
               </Button>
@@ -152,21 +174,31 @@ function ScholarshipsContent(): React.ReactElement {
             <TableBody>
               {scholarships.map((scholarship) => (
                 <TableRow key={scholarship.id}>
-                  <TableCell className="font-medium">{scholarship.id}</TableCell>
-                  <TableCell className="font-medium">{scholarship.name}</TableCell>
-                  <TableCell className="truncate max-w-[250px]">{scholarship.description}</TableCell>
+                  <TableCell className="font-medium">
+                    {scholarship.id}
+                  </TableCell>
+                  <TableCell className="font-medium">
+                    {scholarship.name}
+                  </TableCell>
+                  <TableCell className="truncate max-w-[250px]">
+                    {scholarship.description}
+                  </TableCell>
                   <TableCell className="font-semibold text-orange-700">
                     {formatCurrency(scholarship.amount)}
                   </TableCell>
-                  <TableCell>{scholarship.major?.name || "Tất cả ngành"}</TableCell>
-                  <TableCell>{scholarship.campus?.name || "Tất cả cơ sở"}</TableCell>
+                  <TableCell>
+                    {scholarship.major?.name || "Tất cả ngành"}
+                  </TableCell>
+                  <TableCell>
+                    {scholarship.campus?.name || "Tất cả cơ sở"}
+                  </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
                       <Button variant="outline" size="sm" className="h-8">
                         Xem
                       </Button>
-                      <Button 
-                        size="sm" 
+                      <Button
+                        size="sm"
                         className="h-8 bg-gradient-to-r from-orange-400 to-amber-500 hover:from-orange-500 hover:to-amber-600"
                       >
                         Sửa
@@ -188,7 +220,13 @@ function ScholarshipsContent(): React.ReactElement {
  */
 export function Scholarships(): React.ReactElement {
   return (
-    <ErrorBoundary fallback={<div className="p-4 text-red-500">Có lỗi xảy ra khi tải dữ liệu học bổng</div>}>
+    <ErrorBoundary
+      fallback={
+        <div className="p-4 text-red-500">
+          Có lỗi xảy ra khi tải dữ liệu học bổng
+        </div>
+      }
+    >
       <Suspense fallback={<Loading />}>
         <ScholarshipsContent />
       </Suspense>

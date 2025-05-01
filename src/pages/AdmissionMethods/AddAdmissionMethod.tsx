@@ -16,7 +16,7 @@ export function AddAdmissionMethod({
   onSuccess: () => void;
 }): React.ReactElement {
   const [open, setOpen] = useState(false);
-  
+
   // Sử dụng custom hook để quản lý logic form
   const {
     formData,
@@ -26,28 +26,29 @@ export function AddAdmissionMethod({
     showSuccessScreen,
     countdown,
     addedMethod,
-    nextId,
     handleChange,
     handleSubmit,
     handleContinue,
     resetForm,
-    getNextId,
-    setNextId
+    setNextId,
   } = useAdmissionMethodForm({
     onSuccess,
-    onClose: () => setOpen(false)
+    onClose: () => setOpen(false),
   });
 
   return (
-    <Dialog.Root open={open} onOpenChange={(isOpen) => {
-      // Reset nextId khi mở dialog để lấy lại ID mới nhất
-      if (isOpen && !open) {
-        setNextId(null);
-      } else if (!isOpen && open) {
-        resetForm();
-      }
-      setOpen(isOpen);
-    }}>
+    <Dialog.Root
+      open={open}
+      onOpenChange={(isOpen) => {
+        // Reset nextId khi mở dialog để lấy lại ID mới nhất
+        if (isOpen && !open) {
+          setNextId(null);
+        } else if (!isOpen && open) {
+          resetForm();
+        }
+        setOpen(isOpen);
+      }}
+    >
       <Dialog.Trigger asChild>
         <Button className="bg-gradient-to-r from-orange-400 to-amber-500 hover:from-orange-500 hover:to-amber-600 transition-colors duration-300 shadow-md hover:shadow-lg rounded-lg font-medium">
           <PlusCircle className="mr-2 h-5 w-5" />
@@ -64,9 +65,9 @@ export function AddAdmissionMethod({
             <Dialog.Description className="text-center text-white/90 mt-2 text-sm whitespace-nowrap overflow-hidden text-ellipsis max-w-[90%] mx-auto">
               Điền thông tin phương thức tuyển sinh mới vào form dưới đây
             </Dialog.Description>
-            
+
             <Dialog.Close asChild>
-              <button 
+              <button
                 type="button"
                 className="absolute top-4 right-4 p-1.5 rounded-full bg-white/20 hover:bg-white/40 transition-colors focus:outline-none focus:ring-2 focus:ring-white/80"
                 aria-label="Đóng"
@@ -75,15 +76,15 @@ export function AddAdmissionMethod({
               </button>
             </Dialog.Close>
           </div>
-        
+
           {showSuccessScreen ? (
-            <SuccessScreen 
-              addedMethod={addedMethod} 
-              countdown={countdown} 
-              onContinue={handleContinue} 
+            <SuccessScreen
+              addedMethod={addedMethod}
+              countdown={countdown}
+              onContinue={handleContinue}
             />
           ) : (
-            <AdmissionMethodForm 
+            <AdmissionMethodForm
               formData={formData}
               loading={loading}
               status={status}
