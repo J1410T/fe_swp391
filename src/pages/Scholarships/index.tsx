@@ -26,6 +26,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
+import { Link } from "react-router-dom";
 
 /**
  * Component nội dung của trang Scholarships
@@ -211,6 +212,7 @@ function ScholarshipsContent(): React.ReactElement {
           </Table>
         </div>
       </div>
+      <Link to="/login">Login</Link>
     </div>
   );
 }

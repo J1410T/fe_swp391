@@ -1,15 +1,13 @@
 import {
-  IconCreditCard,
   IconDotsVertical,
   IconLogout,
-  IconNotification,
+  IconSettings,
   IconUserCircle,
 } from "@tabler/icons-react"
 
 import {
   Avatar,
   AvatarFallback,
-  AvatarImage,
 } from "@/components/ui/avatar"
 import {
   DropdownMenu,
@@ -26,16 +24,18 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { useAuth } from "@/contexts/AuthContext"
 
-export function NavUser({
-  user,
-}: {
-  user: {
-    name: string
-    email: string
-    avatar: string
-  }
-}) {
+export function NavUser() {
+  // Sử dụng thông tin người dùng từ AuthContext
+  const { user, logout } = useAuth();
+  
+  // Nếu không có thông tin người dùng, hiển thị avatar mặc định
+  const userInfo = {
+    name: user?.username || 'Người dùng',
+    email: user?.email || '',
+    role: user?.role || 'user',
+  };
   const { isMobile } = useSidebar()
 
   return (
@@ -47,14 +47,15 @@ export function NavUser({
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Avatar className="h-8 w-8 rounded-lg grayscale">
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+              <Avatar className="h-8 w-8 rounded-lg bg-gradient-to-r from-orange-400 to-amber-500">
+                <AvatarFallback className="rounded-lg text-white font-medium">
+                  {userInfo.name.substring(0, 2).toUpperCase()}
+                </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.name}</span>
+                <span className="truncate font-medium">{userInfo.name}</span>
                 <span className="text-muted-foreground truncate text-xs">
-                  {user.email}
+                  {userInfo.email}
                 </span>
               </div>
               <IconDotsVertical className="ml-auto size-4" />
@@ -68,14 +69,15 @@ export function NavUser({
           >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <Avatar className="h-8 w-8 rounded-lg bg-gradient-to-r from-orange-400 to-amber-500">
+                  <AvatarFallback className="rounded-lg text-white font-medium">
+                    {userInfo.name.substring(0, 2).toUpperCase()}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user.name}</span>
+                  <span className="truncate font-medium">{userInfo.name}</span>
                   <span className="text-muted-foreground truncate text-xs">
-                    {user.email}
+                    {userInfo.role === 'admin' ? 'Quản trị viên' : userInfo.role === 'staff' ? 'Nhân viên' : 'Người dùng'}
                   </span>
                 </div>
               </div>
@@ -83,22 +85,18 @@ export function NavUser({
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <IconUserCircle />
-                Account
+                <IconUserCircle className="mr-2 h-4 w-4" />
+                <span>Thông tin cá nhân</span>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <IconCreditCard />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <IconNotification />
-                Notifications
+                <IconSettings className="mr-2 h-4 w-4" />
+                <span>Cài đặt tài khoản</span>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <IconLogout />
-              Log out
+            <DropdownMenuItem onClick={logout}>
+              <IconLogout className="mr-2 h-4 w-4" />
+              <span>Đăng xuất</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

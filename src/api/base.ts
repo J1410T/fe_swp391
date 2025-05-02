@@ -4,6 +4,13 @@
 
 import { createResource, type Resource } from '@/utils/suspense';
 import { env } from '@/config/env';
+import { getToken } from './resources/auth';
+
+// Biến để theo dõi nếu đang làm mới token
+let isRefreshingToken = false;
+// Hàng đợi các request đang chờ token mới
+let refreshQueue: Array<() => void> = [];
+
 /**
  * Interface cho tham số query
  */
@@ -28,6 +35,55 @@ export function buildQueryString(params: QueryParams): string {
 }
 
 /**
+ * Xử lý làm mới token
+ * @returns Promise<boolean> - true nếu làm mới thành công
+ */
+async function handleTokenRefresh(): Promise<boolean> {
+  console.log('API base: handleTokenRefresh called');
+  
+  // Nếu đang làm mới token, đợi quá trình hoàn tất
+  if (isRefreshingToken) {
+    console.log('Token refresh already in progress, waiting...');
+    return new Promise<boolean>((resolve) => {
+      refreshQueue.push(() => resolve(true));
+    });
+  }
+
+  try {
+    isRefreshingToken = true;
+    console.log('Starting token refresh');
+    
+    // Kiểm tra sessionStorage
+    const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
+    if (!isLoggedIn) {
+      console.log('No active session, skip token refresh');
+      return false;
+    }
+    
+    // Import động để tránh circular dependency
+    const { authApi } = await import('./resources/auth');
+    const response = await authApi.refreshToken();
+    
+    // Xử lý thành công
+    if (response.success) {
+      console.log('Token refresh successful');
+      // Xử lý các request đang đợi
+      refreshQueue.forEach(callback => callback());
+      refreshQueue = [];
+      return true;
+    }
+    
+    console.log('Token refresh failed');
+    return false;
+  } catch (error) {
+    console.error('Failed to refresh token:', error);
+    return false;
+  } finally {
+    isRefreshingToken = false;
+  }
+}
+
+/**
  * API client cơ bản
  */
 export const api = {
@@ -41,7 +97,7 @@ export const api = {
   async fetch<TData>(endpoint: string, params?: QueryParams, options: RequestInit = {}): Promise<TData> {
     const queryString = params ? buildQueryString(params) : '';
     
-    // Sử dụng trực tiếp API_SERVER từ biến môi trường
+    // Xác định đường dẫn API dựa trên endpoint
     let fullUrl;
     
     if (endpoint.startsWith('http')) {
@@ -73,19 +129,91 @@ export const api = {
       }
     }
     
-    const response = await fetch(fullUrl, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      }
-    });
+    // Lấy token JWT từ localStorage (nếu có)
+    const token = getToken();
     
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    // Đối với API `/auth/me`, kiểm tra phiên đăng nhập trước khi gọi API
+    if (endpoint === '/auth/me') {
+      const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
+      const savedUser = localStorage.getItem('auth_user');
+      
+      // Nếu không có token hoặc phiên đăng nhập, không cần gọi API
+      if (!token || !isLoggedIn) {
+        return Promise.reject(new Error('Authentication failed'));
+      }
+      
+      // Nếu đã có thông tin user trong localStorage, kiểm tra xem token có hợp lệ không
+      // bằng cách lấy thời gian hết hạn
+      try {
+        const tokenData = localStorage.getItem('auth_token');
+        if (tokenData) {
+          const { expiry } = JSON.parse(tokenData);
+          
+          // Nếu token còn hạn và đã có user, trả về dữ liệu từ localStorage để tránh request mạng
+          if (expiry && expiry > Date.now() && savedUser) {
+            return {
+              data: { user: JSON.parse(savedUser) },
+              success: true,
+              message: "User info retrieved from cache",
+              timestamp: new Date().toISOString()
+            } as unknown as TData;
+          }
+        }
+      } catch (error) {
+        console.error('Error parsing cached auth data', error);
+      }
     }
-
-    return response.json();
+    
+    // Thêm token vào header nếu có
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      ...(options.headers as Record<string, string> || {}),
+    };
+    
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    try {
+      const response = await fetch(fullUrl, {
+        ...options,
+        headers
+      });
+      
+      // Theo dõi API gọi
+      console.log(`API ${options.method || 'GET'} ${endpoint} - status: ${response.status}`);
+      
+      // Xử lý lỗi 401 Unauthorized (token hết hạn)
+      if (response.status === 401 && endpoint !== '/auth/refresh' && endpoint !== '/auth/login') {
+        console.log(`401 Unauthorized for ${endpoint}, attempting token refresh`);
+        
+        // Thử làm mới token
+        const refreshSuccess = await handleTokenRefresh();
+        
+        if (refreshSuccess) {
+          console.log('Token refreshed successfully, retrying original request');
+          // Nếu làm mới token thành công, thử lại request với token mới
+          return this.fetch<TData>(endpoint, params, options);
+        } else {
+          console.log('Token refresh failed, clearing auth state');
+          // Xóa dữ liệu phiên đăng nhập
+          sessionStorage.removeItem('isLoggedIn');
+          // Nếu không thể làm mới token, ném lỗi xác thực
+          throw new Error('Authentication failed');
+        }
+      }
+      
+      if (!response.ok) {
+        console.error(`HTTP error! status: ${response.status} for ${endpoint}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+  
+      return response.json();
+    } catch (error) {
+      // Nếu lỗi không phải do xác thực, ném lỗi gốc
+      console.error(`API request error for ${endpoint}:`, error);
+      throw error;
+    }
   },
 
   /**

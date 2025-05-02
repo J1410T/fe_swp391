@@ -26,11 +26,6 @@ import {
  * Data for the sidebar navigation
  */
 const data = {
-  user: {
-    name: "Admin",
-    email: "admin@fpt.edu.vn",
-    avatar: "/avatars/admin.jpg",
-  },
   navMain: [
     {
       title: "Dashboard",
@@ -113,7 +108,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarFooter>
         <div className="flex items-center justify-between">
-          <NavUser user={data.user} />
+          <NavUser />
         </div>
       </SidebarFooter>
     </Sidebar>

@@ -203,46 +203,6 @@ function CampusesContent(): React.ReactElement {
           </Card>
         ))}
       </div>
-
-      <Separator className="my-8" />
-
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Danh sách cơ sở đào tạo</h2>
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-orange-50">
-                <TableHead className="w-[80px]">ID</TableHead>
-                <TableHead className="w-[300px]">Tên cơ sở</TableHead>
-                <TableHead>Địa chỉ</TableHead>
-                <TableHead className="w-[150px] text-right">Thao tác</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {campuses.map((campus) => (
-                <TableRow key={campus.id}>
-                  <TableCell className="font-medium">{campus.id}</TableCell>
-                  <TableCell className="font-medium">{campus.name}</TableCell>
-                  <TableCell>{campus.address}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button variant="outline" size="sm" className="h-8">
-                        Xem
-                      </Button>
-                      <Button
-                        size="sm"
-                        className="h-8 bg-gradient-to-r from-orange-400 to-amber-500 hover:from-orange-500 hover:to-amber-600"
-                      >
-                        Sửa
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      </div>
     </div>
   );
 }

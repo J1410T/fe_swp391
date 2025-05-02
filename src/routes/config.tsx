@@ -9,7 +9,9 @@ import { admissionMethodsRoute } from '@/routes/admission-methods';
 import { campusesRoute } from '@/routes/campuses';
 import { scholarshipsRoute } from '@/routes/scholarships';
 import { dormitoriesRoute } from '@/routes/dormitories';
-import { loginRoute } from '@/routes/auth/login';
+import authRoutes from '@/routes/auth';
+import { AuthGuard } from '@/components/auth/auth-guard';
+import Unauthorized from '@/pages/Unauthorized';
 
 import { Navigate } from 'react-router-dom';
 
@@ -17,16 +19,25 @@ import { Navigate } from 'react-router-dom';
  * Main application routes configuration
  */
 export const routes: RouteObject[] = [
+  // Chuyển hướng từ trang chủ đến trang đăng nhập
   {
     path: '/',
-    element: <MainLayout />,
+    element: <Navigate to="/auth/login" replace />,
+  },
+  // Các trang chính của ứng dụng (yêu cầu đăng nhập)
+  {
+    path: '/',
+    element: (
+      <AuthGuard>
+        <MainLayout />
+      </AuthGuard>
+    ),
     errorElement: <ErrorBoundaryPage />,
     children: [
       {
-        path: '/',
-        element: <Navigate to="/dashboard" />,
+        path: 'dashboard',
+        element: dashboardRoute.element,
       },
-      dashboardRoute,
       majorsRoute,
       admissionMethodsRoute,
       campusesRoute,
@@ -35,11 +46,17 @@ export const routes: RouteObject[] = [
       notFoundRoute,
     ],
   },
+  // Trang không có quyền truy cập
+  {
+    path: '/unauthorized',
+    element: <Unauthorized />,
+  },
+  // Các trang xác thực (không yêu cầu đăng nhập)
   {
     path: '/auth',
     element: <AuthLayout />,
     children: [
-      loginRoute,
+      ...authRoutes,
     ],
   },
 ]; 
