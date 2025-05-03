@@ -5,13 +5,11 @@ import {
   IconBuildingSkyscraper,
   IconCertificate,
   IconDashboard,
-  IconSchool,
-  // IconSettings,
   // IconUser,
   // IconHistory,
   // IconHelp,
 } from "@tabler/icons-react";
-
+import { Bolt } from 'lucide-react';
 import { NavMain } from "@/components/layout/nav-main";
 // import { NavSecondary } from "@/components/layout/nav-secondary";
 import { NavUser } from "@/components/layout/nav-user";
@@ -33,11 +31,6 @@ const data = {
       icon: IconDashboard,
     },
     {
-      title: "Ngành học",
-      url: "/majors",
-      icon: IconSchool,
-    },
-    {
       title: "Kế hoạch tuyển sinh",
       url: "/admission-methods",
       icon: IconCertificate,
@@ -47,10 +40,15 @@ const data = {
       url: "/campuses",
       icon: IconBuildingSkyscraper,
     },
+    // {
+    //   title: "Học bổng",
+    //   url: "/scholarships",
+    //   icon: IconCertificate,
+    // },
     {
-      title: "Học bổng",
-      url: "/scholarships",
-      icon: IconCertificate,
+      title: "Cấu hình ngành học",
+      url: "/majors",
+      icon: Bolt,
     },
     // {
     //   title: "Ký túc xá",
