@@ -1,6 +1,7 @@
 import { type Icon } from "@tabler/icons-react"
 import { Link, useLocation } from "react-router-dom"
 import { cn } from "@/lib/utils"
+import { type LucideIcon } from "lucide-react"
 
 import {
   SidebarGroup,
@@ -19,7 +20,7 @@ export function NavMain({
   items: {
     title: string
     url: string
-    icon?: Icon
+    icon?: Icon | LucideIcon
   }[]
 }): React.ReactElement {
   const location = useLocation();
