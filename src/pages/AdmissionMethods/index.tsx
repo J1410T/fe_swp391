@@ -1,93 +1,79 @@
 import { useState, useEffect, Suspense } from "react";
-import { admissionMethodsApi } from "@/api/resources/admission-methods";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { motion } from "framer-motion";
+import { Plus, GraduationCap, School, Award, Calendar } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Loading } from "@/components/common/loading";
 import { ErrorBoundary } from "@/components/common/error-boundary";
-import { toast } from "sonner";
-import { AddAdmissionMethod } from "./AddAdmissionMethod";
-import { EditAdmissionMethod } from "./components/EditAdmissionMethod";
-import { DeleteAdmissionMethod } from "./components/DeleteAdmissionMethod";
-import type { AdmissionMethod } from "@/types";
-// import {
-//   Dialog,
-//   DialogContent,
-//   DialogDescription,
-//   DialogFooter,
-//   DialogHeader,
-//   DialogTitle,
-//   DialogTrigger,
-// } from "@/components/ui/dialog";
-// import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+
+// Custom hooks
+import { useAcademicYears } from "./hooks/useAcademicYears";
+
+// Components
+import { AcademicYearCard } from "./components/AcademicYearCard";
+import { YearContentTabs } from "./components/YearContentTabs";
+import { AddAcademicYearModal } from "./components/AddAcademicYearModal";
+import { EditAcademicYearModal } from "./components/EditAcademicYearModal";
+import { DeleteAcademicYearModal } from "./components/DeleteAcademicYearModal";
 
 /**
  * Component nội dung của trang AdmissionMethods
  */
 function AdmissionMethodsContent(): React.ReactElement {
-  const [admissionMethods, setAdmissionMethods] = useState<AdmissionMethod[]>(
-    []
-  );
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<Error | null>(null);
+  const {
+    academicYears,
+    loading,
+    error,
+    expandedYear,
+    fetchAcademicYears,
+    addAcademicYear,
+    updateAcademicYear,
+    deleteAcademicYear,
+    toggleYearExpanded,
+  } = useAcademicYears();
 
-  /**
-   * Lấy danh sách phương thức tuyển sinh và sắp xếp theo ID tăng dần
-   */
-  const fetchAdmissionMethods = async () => {
-    try {
-      setLoading(true);
-      const response = await admissionMethodsApi.getAll();
-
-      // Sắp xếp danh sách theo ID tăng dần
-      const sortedData = [...response.data].sort((a, b) => a.id - b.id);
-      setAdmissionMethods(sortedData);
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error("Lỗi không xác định"));
-      toast.error("Không thể tải dữ liệu phương thức tuyển sinh");
-    } finally {
-      setLoading(false);
-    }
-  };
+  // State cho các modal
+  const [isAddYearModalOpen, setIsAddYearModalOpen] = useState(false);
+  const [isEditYearModalOpen, setIsEditYearModalOpen] = useState(false);
+  const [isDeleteYearModalOpen, setIsDeleteYearModalOpen] = useState(false);
+  const [selectedYear, setSelectedYear] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchAdmissionMethods();
-  }, []);
+    fetchAcademicYears();
+  }, [fetchAcademicYears]);
 
-  // const fetchAdmissionMethodsByAcademicYear = async () => {
-  //   try {
-  //     // Lấy phương thức tuyển sinh cho năm 2025
-  //     const response = await admissionMethodsApi.getByAcademicYear("2025");
-  //     const sortedData = [...response.data].sort((a, b) => a.id - b.id);
-  //     setAdmissionMethods(sortedData);
-  //   } catch (err) {
-  //     setError(err instanceof Error ? err : new Error("Lỗi không xác định"));
-  //     toast.error("Không thể tải dữ liệu phương thức tuyển sinh");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+  // Handlers cho các thao tác với năm tuyển sinh
+  const handleAddYear = async (year: string) => {
+    await addAcademicYear(year);
+    return fetchAcademicYears();
+  };
 
-  // useEffect(() => {
-  //   fetchAdmissionMethods();
-  // }, []);
+  const handleEditYear = (year: string) => {
+    setSelectedYear(year);
+    setIsEditYearModalOpen(true);
+  };
+
+  const handleDeleteYear = (year: string) => {
+    setSelectedYear(year);
+    setIsDeleteYearModalOpen(true);
+  };
+
+  const handleUpdateYear = async () => {
+    if (selectedYear) {
+      await updateAcademicYear(selectedYear);
+      return fetchAcademicYears();
+    }
+    return Promise.resolve();
+  };
+
+  const handleConfirmDeleteYear = async () => {
+    if (selectedYear) {
+      await deleteAcademicYear(selectedYear);
+      return fetchAcademicYears();
+    }
+    return Promise.resolve();
+  };
 
   if (loading) {
     return <Loading />;
@@ -101,261 +87,199 @@ function AdmissionMethodsContent(): React.ReactElement {
     );
   }
 
+  // Hiệu ứng animation
+  const containerAnimation = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        duration: 0.3
+      }
+    }
+  };
+
+  const itemAnimation = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 300 } }
+  };
+
+  const fadeInUpAnimation = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { y: 0, opacity: 1, transition: { duration: 0.5 } }
+  };
+
   return (
-    <div className="container mx-auto py-10 space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Phương thức tuyển sinh
-          </h1>
-          <p className="text-muted-foreground">
-            Quản lý các phương thức tuyển sinh của trường
+    <motion.div 
+      className="container mx-auto py-10 space-y-8"
+      initial="hidden"
+      animate="visible"
+      variants={containerAnimation}
+    >
+      {/* Header */}
+      <motion.div 
+        className="flex flex-col md:flex-row md:justify-between md:items-center gap-4"
+        variants={fadeInUpAnimation}
+      >
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <GraduationCap className="h-8 w-8 text-orange-500" />
+            <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-orange-500 to-amber-600 text-transparent bg-clip-text">
+              Quản lý tuyển sinh
+            </h1>
+          </div>
+          <p className="text-muted-foreground pl-10">
+            Quản lý các năm tuyển sinh, ngành học và học bổng
           </p>
         </div>
-        <AddAdmissionMethod onSuccess={fetchAdmissionMethods} />
-      </div>
+        <Button
+          variant="default"
+          className="bg-gradient-to-r from-orange-400 to-amber-500 hover:from-orange-500 hover:to-amber-600 text-white shadow-md hover:shadow-lg transition-all duration-300 md:self-end"
+          onClick={() => setIsAddYearModalOpen(true)}
+        >
+          <Plus className="mr-2 h-4 w-4" />
+          Thêm năm tuyển sinh
+        </Button>
+      </motion.div>
 
-      <Separator />
+      <motion.div variants={itemAnimation}>
+        <Separator className="bg-gradient-to-r from-orange-200 to-amber-200" />
+      </motion.div>
 
-      <Tabs defaultValue="table" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="table">Bảng</TabsTrigger>
-          <TabsTrigger value="cards">Thẻ</TabsTrigger>
-        </TabsList>
+      {/* Thống kê nhanh */}
+      <motion.div 
+        className="grid grid-cols-1 md:grid-cols-3 gap-4"
+        variants={itemAnimation}
+      >
+        <Card className="bg-gradient-to-br from-orange-50 to-amber-50 border-orange-100 hover:shadow-md transition-all duration-300">
+          <CardContent className="p-6 flex items-center gap-4">
+            <div className="p-3 bg-orange-100 rounded-full">
+              <Calendar className="h-6 w-6 text-orange-500" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-orange-800">Năm tuyển sinh</p>
+              <p className="text-2xl font-bold">{academicYears.length}</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100 shadow-sm hover:shadow-md transition-all duration-300">
+          <CardContent className="p-6 flex items-center gap-4">
+            <div className="p-3 bg-blue-100 rounded-full">
+              <School className="h-6 w-6 text-blue-500" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-blue-800">Tổng ngành học</p>
+              <p className="text-2xl font-bold">24</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-gradient-to-br from-purple-50 to-violet-50 border-purple-100 shadow-sm hover:shadow-md transition-all duration-300">
+          <CardContent className="p-6 flex items-center gap-4">
+            <div className="p-3 bg-purple-100 rounded-full">
+              <Award className="h-6 w-6 text-purple-500" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-purple-800">Học bổng</p>
+              <p className="text-2xl font-bold">12</p>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
 
-        <TabsContent value="table" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Danh sách phương thức tuyển sinh</CardTitle>
-              <CardDescription>
-                Tất cả các phương thức tuyển sinh hiện có trong hệ thống
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableCaption>Danh sách phương thức tuyển sinh</TableCaption>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[100px]">ID</TableHead>
-                    <TableHead>Tên phương thức</TableHead>
-                    <TableHead>Mô tả</TableHead>
-                    <TableHead>URL đăng ký</TableHead>
-                    <TableHead className="text-right">Thao tác</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {admissionMethods.map((method) => (
-                    <TableRow key={method.id}>
-                      <TableCell className="font-medium">{method.id}</TableCell>
-                      <TableCell>{method.name}</TableCell>
-                      <TableCell>{method.description}</TableCell>
-                      <TableCell>
-                        <a
-                          href={method.application_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-500 hover:underline"
-                        >
-                          {method.application_url}
-                        </a>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <EditAdmissionMethod
-                            method={method}
-                            onSuccess={fetchAdmissionMethods}
-                          />
-                          <DeleteAdmissionMethod
-                            method={method}
-                            onSuccess={fetchAdmissionMethods}
-                          />
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="cards" className="mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {admissionMethods.map((method) => (
-              <Card key={method.id} className="overflow-hidden">
-                <CardHeader className="pb-3">
-                  <CardTitle>{method.name}</CardTitle>
-                  <CardDescription className="line-clamp-2">
-                    {method.description}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <div className="flex items-center">
-                      <span className="text-muted-foreground text-sm">ID:</span>
-                      <Badge variant="outline" className="ml-2">
-                        {method.id}
-                      </Badge>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground text-sm">
-                        URL đăng ký:
-                      </span>
-                      <a
-                        href={method.application_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="ml-2 text-blue-500 hover:underline text-sm"
-                      >
-                        {method.application_url}
-                      </a>
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter className="flex justify-between pt-3 border-t">
-                  <div className="flex gap-2">
-                    <EditAdmissionMethod
-                      method={method}
-                      onSuccess={fetchAdmissionMethods}
-                    />
-                    <DeleteAdmissionMethod
-                      method={method}
-                      onSuccess={fetchAdmissionMethods}
-                    />
-                  </div>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-      </Tabs>
-      {/* <TabsContent value="cards" className="mt-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {admissionMethods.map((method) => (
-            <Card
-              key={method.id}
-              className="overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer"
+      {/* Danh sách năm tuyển sinh */}
+      <motion.div className="space-y-4" variants={itemAnimation}>
+        <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
+          <Calendar className="h-5 w-5 text-orange-500" />
+          Danh sách năm tuyển sinh
+        </h2>
+        
+        <div className="space-y-4">
+          {academicYears.length > 0 ? (
+            academicYears.map((year, index) => (
+              <motion.div 
+                key={year.year}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <AcademicYearCard
+                  year={year.year}
+                  expanded={expandedYear === year.year}
+                  onToggle={() => toggleYearExpanded(year.year)}
+                  onEdit={() => handleEditYear(year.year)}
+                  onDelete={() => handleDeleteYear(year.year)}
+                >
+                  <YearContentTabs
+                    academicYear={year.year}
+                    onRefetch={fetchAcademicYears}
+                  />
+                </AcademicYearCard>
+              </motion.div>
+            ))
+          ) : (
+            <motion.div 
+              className="text-center py-16 bg-gradient-to-br from-orange-50 to-amber-50 rounded-lg border border-orange-100 shadow-sm"
+              variants={fadeInUpAnimation}
             >
-              <Dialog>
-                <DialogTrigger asChild>
-                  <CardHeader className="pb-3">
-                    <CardTitle>{method.name}</CardTitle>
-                    <CardDescription className="line-clamp-2">
-                      {method.description}
-                    </CardDescription>
-                  </CardHeader>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[625px]">
-                  <DialogHeader>
-                    <DialogTitle>{method.name}</DialogTitle>
-                    <DialogDescription>
-                      Chi tiết phương thức tuyển sinh
-                    </DialogDescription>
-                  </DialogHeader>
-
-                  <div className="grid gap-4 py-4">
-                    <div>
-                      <h4 className="text-lg font-semibold mb-2">
-                        Thông Tin Chi Tiết
-                      </h4>
-                      <div className="space-y-2">
-                        <p>
-                          <span className="font-medium">Mã Phương Thức:</span>{" "}
-                          {method.code || "Chưa cập nhật"}
-                        </p>
-                        <p>
-                          <span className="font-medium">Năm Học:</span>{" "}
-                          {method.academicYear || "Chưa xác định"}
-                        </p>
-                        <p>
-                          <span className="font-medium">URL Đăng Ký:</span>
-                          <a
-                            href={method.application_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="ml-2 text-blue-500 hover:underline"
-                          >
-                            {method.application_url}
-                          </a>
-                        </p>
-                      </div>
-                    </div>
-
-                    <Separator />
-
-                    <div>
-                      <h4 className="text-lg font-semibold mb-2">
-                        Mô Tả Chi Tiết
-                      </h4>
-                      <p>{method.description}</p>
-                    </div>
-                  </div>
-
-                  <DialogFooter>
-                    <Button
-                      variant="outline"
-                      onClick={() =>
-                        window.open(method.application_url, "_blank")
-                      }
-                    >
-                      Đăng Ký Ngay
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-
-              <CardContent>
-                <div className="space-y-2">
-                  <div className="flex items-center">
-                    <span className="text-muted-foreground text-sm">ID:</span>
-                    <Badge variant="outline" className="ml-2">
-                      {method.id}
-                    </Badge>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground text-sm">
-                      URL đăng ký:
-                    </span>
-                    <a
-                      href={method.application_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="ml-2 text-blue-500 hover:underline text-sm"
-                    >
-                      {method.application_url}
-                    </a>
-                  </div>
-                </div>
-              </CardContent>
-              <CardFooter className="flex justify-between pt-3 border-t">
-                <div className="flex gap-2">
-                  <EditAdmissionMethod
-                    method={method}
-                    onSuccess={fetchAdmissionMethodsByAcademicYear}
-                  />
-                  <DeleteAdmissionMethod
-                    method={method}
-                    onSuccess={fetchAdmissionMethodsByAcademicYear}
-                  />
-                </div>
-              </CardFooter>
-            </Card>
-          ))}
+              <Calendar className="h-16 w-16 text-orange-300 mx-auto mb-4" />
+              <h3 className="text-xl font-medium text-gray-900 mb-2">
+                Chưa có năm tuyển sinh nào
+              </h3>
+              <p className="text-gray-500 mb-6 max-w-md mx-auto">
+                Bắt đầu quản lý tuyển sinh bằng cách thêm năm tuyển sinh đầu tiên
+              </p>
+              <Button
+                variant="default"
+                className="bg-gradient-to-r from-orange-400 to-amber-500 hover:from-orange-500 hover:to-amber-600 text-white shadow-md hover:shadow-lg transition-all duration-300"
+                onClick={() => setIsAddYearModalOpen(true)}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Thêm năm tuyển sinh
+              </Button>
+            </motion.div>
+          )}
         </div>
-      </TabsContent> */}
-    </div>
+      </motion.div>
+      {/* Modals */}
+      <AddAcademicYearModal
+        isOpen={isAddYearModalOpen}
+        onClose={() => setIsAddYearModalOpen(false)}
+        onSuccess={handleAddYear}
+        existingYears={academicYears.map((year) => year.year)}
+      />
+
+      {selectedYear && (
+        <>
+          <EditAcademicYearModal
+            isOpen={isEditYearModalOpen}
+            onClose={() => setIsEditYearModalOpen(false)}
+            onSuccess={handleUpdateYear}
+            year={selectedYear}
+            description={academicYears.find((y) => y.year === selectedYear)?.description}
+          />
+
+          <DeleteAcademicYearModal
+            isOpen={isDeleteYearModalOpen}
+            onClose={() => setIsDeleteYearModalOpen(false)}
+            onSuccess={handleConfirmDeleteYear}
+            year={selectedYear}
+          />
+        </>
+      )}
+    </motion.div>
   );
 }
 
 /**
  * Trang quản lý phương thức tuyển sinh
  */
-export function AdmissionMethods(): React.ReactElement {
+function AdmissionMethods(): React.ReactElement {
   return (
     <ErrorBoundary
       fallback={
-        <div className="p-4 border border-red-300 rounded-md text-red-500">
-          Đã xảy ra lỗi khi tải dữ liệu phương thức tuyển sinh
+        <div className="p-8 text-center">
+          <h2 className="text-2xl font-bold">Đã xảy ra lỗi</h2>
+          <p>Vui lòng thử lại sau</p>
         </div>
       }
     >

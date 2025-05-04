@@ -18,7 +18,7 @@ export const majorsApi = {
    */
   getAll: async (
     params?: PaginationParams & SortParams & Partial<FilterParams>
-  ): Promise<ApiResponse<PaginatedResponse<Major>>> => {
+  ): Promise<ApiResponse<Major[]>> => {
     return await api.get('/majors', { params });
   },
   

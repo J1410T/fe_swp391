@@ -29,6 +29,28 @@ export interface Scholarship {
 }
 
 /**
+ * Thông tin học bổng theo năm học và cơ sở
+ */
+export interface ScholarshipAvailability {
+  id: number;
+  scholarship_id: number;
+  academic_year_id: number;
+  campus_id: number | null;
+  major_id: number | null;
+  major: {
+    code: string;
+    name: string;
+  } | null;
+  campus: {
+    code: string;
+    name: string;
+  } | null;
+  academicYear: {
+    year: number;
+  };
+}
+
+/**
  * Response từ API cho học bổng
  */
 export interface ScholarshipResponse {
@@ -37,20 +59,21 @@ export interface ScholarshipResponse {
   description: string;
   condition: string;
   amount: number;
-  major_id: number | null;
-  campus_id: number | null;
+  major_id?: number | null;
+  campus_id?: number | null;
   application_url: string;
-  major: {
+  major?: {
     id: number;
     code: string;
     name: string;
     description: string;
   } | null;
-  campus: {
+  campus?: {
     id: number;
     name: string;
-    address: string;
+    code: string;
   } | null;
+  availabilities: ScholarshipAvailability[];
 }
 
 /**

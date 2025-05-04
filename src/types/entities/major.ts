@@ -19,6 +19,28 @@ export interface Career {
 }
 
 /**
+ * Thông tin cơ sở và năm học cho ngành học
+ */
+export interface MajorCampusAdmission {
+  /** Học phí */
+  tuition_fee: number;
+  /** Chỉ tiêu tuyển sinh */
+  quota: number;
+  /** Thông tin cơ sở */
+  campus: {
+    /** Mã cơ sở */
+    code: string;
+    /** Tên cơ sở */
+    name: string;
+  };
+  /** Thông tin năm học */
+  academicYear: {
+    /** Năm học */
+    year: number;
+  };
+}
+
+/**
  * Thông tin ngành học
  */
 export interface Major {
@@ -28,10 +50,10 @@ export interface Major {
   name: string;
   /** Mã ngành */
   code: string;
-  /** Mô tả ngành học */
-  description: string;
   /** Danh sách cơ hội nghề nghiệp */
   careers: Career[];
+  /** Danh sách thông tin tuyển sinh theo cơ sở và năm học */
+  majorCampusAdmissions: MajorCampusAdmission[];
 }
 
 /**

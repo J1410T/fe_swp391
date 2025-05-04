@@ -32,7 +32,16 @@ export const scholarshipsApi = {
    * @param data Dữ liệu học bổng
    * @returns Promise với học bổng đã tạo
    */
-  create: async (data: Omit<ScholarshipResponse, 'id' | 'major' | 'campus'>): Promise<ApiResponse<ScholarshipResponse>> => {
+  create: async (data: {
+    name: string;
+    condition: string;
+    amount: number;
+    description: string;
+    application_url: string;
+    major_id?: number | null;
+    campus_id?: number | null;
+    academic_year_id: number;
+  }): Promise<ApiResponse<ScholarshipResponse>> => {
     return api.post<ApiResponse<ScholarshipResponse>>('/scholarships', data);
   },
   
