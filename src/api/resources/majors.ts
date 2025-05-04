@@ -19,7 +19,58 @@ export const majorsApi = {
   getAll: async (
     params?: PaginationParams & SortParams & Partial<FilterParams>
   ): Promise<ApiResponse<Major[]>> => {
-    return await api.get('/majors', { params });
+    // Kiểm tra và định dạng lại tham số tìm kiếm nếu cần
+    const queryParams = { ...params } as any; // Sử dụng any để tránh lỗi kiểu dữ liệu
+    
+    // Loại bỏ các tham số phân trang vì API không chấp nhận chúng
+    if (queryParams.page) delete queryParams.page;
+    if (queryParams.limit) delete queryParams.limit;
+    if (queryParams.sortBy) delete queryParams.sortBy;
+    if (queryParams.sortOrder) delete queryParams.sortOrder;
+    
+    // Xử lý tham số code - API không chấp nhận tham số code
+    if (queryParams.code) {
+      // Nếu là số, có thể đây là ID
+      if (!isNaN(Number(queryParams.code))) {
+        queryParams.id = Number(queryParams.code);
+      } else {
+        // Nếu không phải số, có thể đây là mã ngành
+        // Chuyển thành tham số major_code hoặc có thể sử dụng name để tìm kiếm tương đương
+        queryParams.name = queryParams.code;
+      }
+      // Xóa tham số code vì API không chấp nhận
+      delete queryParams.code;
+    }
+    
+    // Xử lý lỗi - Loại bỏ hoặc chuyển đổi major_code nếu không phải số
+    if (queryParams.major_code && isNaN(Number(queryParams.major_code))) {
+      delete queryParams.major_code; // Xóa nếu không phải số
+    }
+
+    // Phân tích tham số tìm kiếm theo tên
+    if (queryParams && queryParams.name) {
+      const searchName = queryParams.name;
+      
+      // Khi tìm kiếm theo tên, đảm bảo không có major_code
+      if (queryParams.major_code) {
+        delete queryParams.major_code;
+      }
+      
+      // Tìm kiếm với tham số name đúng như API mong đợi
+      try {
+        // Chỉ giữ lại tham số name
+        const searchParams = { name: searchName };
+        
+        // Gọi API để tìm kiếm theo tên
+        return await api.get('/majors', { params: searchParams });
+      } catch (error) {
+        console.error("Lỗi khi tìm kiếm theo tên:", error);
+        throw error;
+      }
+    }
+    
+    // Nếu không có tìm kiếm theo tên, sử dụng API thông thường mà không có phân trang
+    return await api.get('/majors', { params: queryParams });
   },
   
   /**

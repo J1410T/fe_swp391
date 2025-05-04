@@ -50,6 +50,8 @@ export interface Major {
   name: string;
   /** Mã ngành */
   code: string;
+  /** Mô tả ngành học */
+  description?: string;
   /** Danh sách cơ hội nghề nghiệp */
   careers: Career[];
   /** Danh sách thông tin tuyển sinh theo cơ sở và năm học */

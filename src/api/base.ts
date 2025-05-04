@@ -205,6 +205,17 @@ export const api = {
       
       if (!response.ok) {
         console.error(`HTTP error! status: ${response.status} for ${endpoint}`);
+        console.error(`Request URL: ${fullUrl}`);
+        console.error(`Request params:`, params);
+        
+        try {
+          // Thử đọc và log body của response lỗi
+          const errorText = await response.text();
+          console.error(`Response error body:`, errorText);
+        } catch (e) {
+          console.error(`Cannot read error response body:`, e);
+        }
+        
         throw new Error(`HTTP error! status: ${response.status}`);
       }
   

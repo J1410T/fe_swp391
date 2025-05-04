@@ -1,38 +1,41 @@
 /**
- * Trang quản lý ngành học
+ * Trang Cấu hình ngành học
  * 
- * Các thay đổi chính:
- * 1. Sửa lỗi xử lý dữ liệu từ API - đảm bảo dữ liệu được hiển thị đúng trong UI
- * 2. Cải thiện giao diện người dùng sử dụng ShadCN UI Components
- * 3. Tối ưu hiển thị thông tin ngành học và cơ hội nghề nghiệp
- * 4. Thêm các tính năng UI/UX: responsive, phân trang, hiển thị trạng thái rỗng
- * 5. Sử dụng TailwindCSS để tạo giao diện nhất quán và đẹp mắt
+ * Chức năng:
+ * 1. Hiển thị 2 tab: "Quản lý Ngành học" và "Phương thức Tuyển sinh"
+ * 2. Tab Ngành học: Hiển thị danh sách ngành học với các thông tin chi tiết
+ * 3. Tab Phương thức tuyển sinh: Hiển thị thông tin phương thức tuyển sinh
+ * 4. Tối ưu giao diện người dùng với Tailwind CSS và ShadCN UI Components
+ * 5. Hỗ trợ xem chi tiết, chỉnh sửa và xóa ngành học
  */
 
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { ErrorBoundary } from "@/components/common/error-boundary";
 import { Loading } from "@/components/common/loading";
 
 // Components
 import { MajorSearch } from "./components/MajorSearch";
-import { MajorsList } from "./components/MajorsList";
 import { ViewMajorSheet } from "./components/ViewMajorSheet";
 import { EditMajorSheet } from "./components/EditMajorSheet";
+import { TabNavigation } from "./components/TabNavigation";
+import { MajorsCardView } from "./components/MajorsCardView";
+import AdmissionMethodsTab from "./components/AdmissionMethodsTab";
 
 // Hooks
-import { useMajors } from "./hooks/useMajors";
+import { useMajorsConfig } from "./hooks/useMajorsConfig";
+import { Major } from "@/types/entities/major";
 
 /**
- * Component nội dung của trang Majors
+ * Component nội dung của trang Cấu hình ngành học
  */
-function MajorsContent(): React.ReactElement {
+function MajorsConfigContent(): React.ReactElement {
   const {
     majorsData,
     pagination,
-    searchQuery,
     viewSheetOpen,
     editSheetOpen,
     selectedMajor,
+    activeTab,
     handleView,
     handleEdit,
     handleDelete,
@@ -40,16 +43,28 @@ function MajorsContent(): React.ReactElement {
     handleAddNew,
     handlePageChange,
     handleUpdateMajor,
+    handleTabChange,
+    handleSelectMajor,
     setViewSheetOpen,
-    setEditSheetOpen
-  } = useMajors();
+    setEditSheetOpen,
+    setSelectedMajor
+  } = useMajorsConfig();
+
+  // Xử lý xem chi tiết ngành học trên major card
+  const handleViewDetail = (major: Major) => {
+    // Chỉ cập nhật major được chọn và mở sheet, không lọc danh sách
+    setSelectedMajor(major);
+    // Mở ViewMajorSheet để hiển thị chi tiết
+    setViewSheetOpen(true);
+  };
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-7xl">
-      <div className="mb-6 bg-gradient-to-r from-orange-50 to-amber-50 p-6 rounded-lg shadow-sm">
-        <h1 className="text-2xl font-bold text-gray-800 mb-2">Quản lý ngành học</h1>
-        <p className="text-gray-600">Quản lý thông tin các ngành đào tạo và cơ hội nghề nghiệp liên quan</p>
-        <div className="h-1 w-24 bg-gradient-to-r from-orange-400 to-amber-500 mt-4 rounded-full"></div>
+      <div className="mb-6 bg-white p-0 rounded-lg shadow-sm">
+        <h1 className="text-2xl font-bold text-gray-800 mb-2 p-6">Cấu Hình Ngành Học</h1>
+
+        {/* Tab Navigation */}
+        <TabNavigation activeTab={activeTab} onTabChange={handleTabChange} />
       </div>
       
       {/* Sheet xem chi tiết ngành học */}
@@ -67,37 +82,49 @@ function MajorsContent(): React.ReactElement {
         onSave={handleUpdateMajor}
       />
 
-      <MajorSearch onSearch={handleSearch} onAddNew={handleAddNew} />
+      {/* Nội dung tab */}
+      {activeTab === "majors" ? (
+        <div className="bg-white rounded-lg p-6 shadow-sm">
+          <MajorSearch 
+            onSearch={handleSearch} 
+            onAddNew={handleAddNew} 
+            onSelectMajor={handleSelectMajor}
+          />
 
-      <MajorsList 
-        majors={majorsData.items} 
-        totalItems={majorsData.total}
-        pagination={pagination}
-        searchQuery={searchQuery}
-        onPageChange={handlePageChange}
-        onView={handleView}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        onAddNew={handleAddNew}
-      />
+          <MajorsCardView
+            majors={majorsData.items} 
+            totalItems={majorsData.total}
+            pagination={pagination}
+            onPageChange={handlePageChange}
+            onView={handleViewDetail}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        </div>
+      ) : (
+        <AdmissionMethodsTab />
+      )}
+
+      {/* Dialog chi tiết ngành học */}
+            
     </div>
   );
 }
 
 /**
- * Trang quản lý ngành học
+ * Trang Cấu hình ngành học
  */
-export default function Majors() {
+export default function MajorsConfig() {
   return (
     <ErrorBoundary
       fallback={
         <div className="p-4 border border-red-300 rounded-md text-red-500 m-4">
-          Đã xảy ra lỗi khi tải dữ liệu ngành học
+          Đã xảy ra lỗi khi tải dữ liệu cấu hình ngành học
         </div>
       }
     >
       <Suspense fallback={<Loading />}>
-        <MajorsContent />
+        <MajorsConfigContent />
       </Suspense>
     </ErrorBoundary>
   );
