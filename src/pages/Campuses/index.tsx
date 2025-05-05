@@ -14,7 +14,7 @@ import {
   MapPin,
   Phone,
   PlusIcon,
-  Trash,
+  Trash2,
 } from "lucide-react";
 import { CampusForm, DeleteDialog } from "./CampusForm";
 import { DormitoryView } from "./DormitoryView";
@@ -98,7 +98,7 @@ function CampusesContent(): React.ReactElement {
         </div>
         <Button
           onClick={() => setTimeout(() => setIsAddCampusDialogOpen(true), 0)}
-          className="bg-orange-400 text-white hover:bg-orange-400 shadow-sm transition-all duration-300 px-5"
+          className="bg-orange-500 text-white hover:bg-orange-600 shadow-sm transition-all duration-300 px-5"
           aria-hidden="false"
         >
           <PlusIcon className="h-5 w-5 mr-2" />
@@ -114,11 +114,11 @@ function CampusesContent(): React.ReactElement {
         {campuses.map((campus) => (
           <Card
             key={campus.id}
-            className="group overflow-hidden hover:shadow-xl transition-all duration-300 rounded-xl border border-gray-200 bg-white transform hover:-translate-y-1 flex flex-col"
+            className="group overflow-hidden hover:shadow-xl transition-all duration-300 rounded-xl border border-gray-200 bg-white transform hover:-translate-y-1 flex flex-col py-0"
           >
             <div className="p-0">
-              <div className="flex flex-row items-start justify-between p-5 relative">
-                <div className="space-y-1">
+              <div className="flex flex-row items-start justify-between p-5 relative bg-gradient-to-r from-orange-50 to-amber-50">
+                <div className="space-y-1 mt-2">
                   <div className="flex items-center space-x-2 mb-1">
                     <div className="bg-orange-600 h-6 w-1 rounded-full"></div>
                     <span className="text-sm font-semibold text-orange-600 uppercase tracking-wider">
@@ -129,31 +129,31 @@ function CampusesContent(): React.ReactElement {
                     {campus.name}
                   </h3>
                 </div>
-                <div className="flex space-x-1 absolute top-4 right-4">
+                <div className="flex space-x-1 absolute top-4 right-4 mt-3">
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="rounded-full bg-gray-100 hover:bg-gray-300 text-blue-600 hover:text-blue-700 shadow-sm"
+                    className=" text-sm font-medium text-blue-500 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 transition-colors"
                     onClick={() => {
                       setSelectedCampus(campus);
                       setTimeout(() => setIsEditCampusDialogOpen(true), 0);
                     }}
                     aria-hidden="false"
                   >
-                    <Edit className="h-4 w-4" />
+                    <Edit className="h-5 w-5 mr-1" />
                     <span className="sr-only">Edit</span>
                   </Button>
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="rounded-full bg-gray-100 hover:bg-gray-300 text-red-600 hover:text-red-700 shadow-sm"
+                    className="text-sm font-medium text-red-500 hover:bg-red-50 hover:text-red-700 hover:border-red-200 transition-colors"
                     onClick={() => {
                       setCampusToDelete(campus);
                       setTimeout(() => setIsDeleteDialogOpen(true), 0);
                     }}
                     aria-hidden="false"
                   >
-                    <Trash className="h-4 w-4" />
+                    <Trash2 className="h-5 w-5 mr-1" />
                     <span className="sr-only">Delete</span>
                   </Button>
                 </div>
@@ -201,7 +201,7 @@ function CampusesContent(): React.ReactElement {
             <div className="bg-white border-t border-gray-200 mt-auto">
               <div className="flex justify-center items-center p-4">
                 <Button
-                  className="w-full bg-orange-400 text-white hover:bg-orange-400 shadow-md hover:shadow-lg transition-all duration-300 px-5"
+                  className="w-full data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-amber-500 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300 rounded-lg flex items-center gap-2"
                   onClick={() => {
                     setSelectedCampus(campus);
                     setTimeout(() => setIsDetailDialogOpen(true), 0);
