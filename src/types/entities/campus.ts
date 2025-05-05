@@ -10,8 +10,6 @@ export interface Campus {
   code: string;
   /** Địa chỉ cơ sở */
   address: string;
-  /** Mô tả cơ sở */
-  description: string;
   /** Trạng thái kích hoạt */
   isActive: boolean;
   /** Thời gian tạo */
@@ -39,7 +37,6 @@ export interface CampusResponse {
     phone: string;
     email: string;
   };
-  description: string;
 }
 
 /**
@@ -57,8 +54,6 @@ export interface CampusCreateData {
     phone: string;
     email: string;
   };
-  /** Mô tả cơ sở */
-  description: string;
 }
 
 /**

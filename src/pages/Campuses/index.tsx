@@ -4,34 +4,20 @@ import { Loading } from "@/components/common/loading";
 import { ErrorBoundary } from "@/components/common/error-boundary";
 import type { CampusesLoaderResponse } from "@/types/loaders/campus";
 import { campusesApi, type CampusResponse } from "@/api/resources/campuses";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-// import { AddCampus } from "./AddCampus";
-import { dormitoriesApi } from "@/api/resources/dormitories";
-import type { DormitoryResponse } from "@/types/entities/dormitory";
 import {
   Building2,
   Edit,
+  HouseIcon,
+  Mail,
   MapPin,
-  MoreHorizontal,
+  Phone,
+  PlusIcon,
   Trash,
-  Users,
 } from "lucide-react";
-import { DialogContent, Dialog } from "@/components/ui/dialog";
 import { CampusForm, DeleteDialog } from "./CampusForm";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DormitoryView } from "./DormitoryView";
 
 /**
  * Component nội dung của trang Campuses
@@ -43,12 +29,10 @@ function CampusesContent(): React.ReactElement {
   const [campuses, setCampuses] = useState<CampusResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedDormitory, setSelectedDormitory] =
-    useState<DormitoryResponse | null>(null);
-  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
   const [selectedCampus, setSelectedCampus] = useState<CampusResponse | null>(
     null
   );
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
   const [isAddCampusDialogOpen, setIsAddCampusDialogOpen] = useState(false);
   const [isEditCampusDialogOpen, setIsEditCampusDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -75,16 +59,9 @@ function CampusesContent(): React.ReactElement {
     fetchCampuses();
   }, []);
 
-  const handleViewDormitoryDetails = async (dormitoryId: number) => {
-    try {
-      const response = await dormitoriesApi.getById(dormitoryId);
-      if (response.data) {
-        setSelectedDormitory(response.data);
-        setIsDetailDialogOpen(true);
-      }
-    } catch (error) {
-      console.error("Lỗi tải chi tiết ký túc xá:", error);
-    }
+  const handleViewDormitoryDetails = (campusData: CampusResponse) => {
+    setSelectedCampus(campusData);
+    setIsDetailDialogOpen(true);
   };
 
   const handleDeleteCampus = async () => {
@@ -110,73 +87,84 @@ function CampusesContent(): React.ReactElement {
 
   return (
     <div className="container mx-auto py-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Cơ sở Đào tạo</h1>
-          <p className="text-muted-foreground mt-1">
-            Quản lý thông tin các cơ sở Đại học FPT trên toàn quốc
-          </p>
+      <div className="flex justify-between items-centers p-4 rounded-lg">
+        <div className="flex items-center space-x-4">
+          <div className="bg-white p-3">
+            <HouseIcon className="h-6 w-6 text-orange-400" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-orange-500">
+              Cơ sở Đào tạo
+            </h1>
+            <p className="text-gray-500 mt-1">
+              Quản lý thông tin các cơ sở Đại học FPT trên toàn quốc
+            </p>
+          </div>
         </div>
         <Button
           onClick={() => setIsAddCampusDialogOpen(true)}
-          className="bg-gradient-to-r from-orange-400 to-amber-500 hover:from-orange-500 hover:to-amber-600"
+          className="bg-orange-400 text-white hover:bg-orange-400 shadow-sm transition-all duration-300 px-5"
+          aria-hidden="false"
         >
+          <PlusIcon className="h-5 w-5 mr-2" />
           Thêm cơ sở mới
         </Button>
-        <CampusForm
-          isOpen={isAddCampusDialogOpen}
-          onOpenChange={setIsAddCampusDialogOpen}
-          onSubmitSuccess={fetchCampuses}
-        />
       </div>
-      <Separator />
+      <CampusForm
+        isOpen={isAddCampusDialogOpen}
+        onOpenChange={setIsAddCampusDialogOpen}
+        onSubmitSuccess={fetchCampuses}
+      />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {campuses.map((campus) => (
           <Card
             key={campus.id}
-            className="overflow-hidden hover:shadow-xl transition-shadow rounded-lg border border-gray-300 bg-white"
+            className="group overflow-hidden hover:shadow-xl transition-all duration-300 rounded-xl border border-gray-200 bg-white transform hover:-translate-y-1 flex flex-col"
           >
-            <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-4 bg-gradient-to-r from-indigo-50 to-indigo-100 p-4">
-              <div className="space-y-1">
-                <CardTitle className="text-xl font-bold text-gray-900">
-                  {campus.name}
-                </CardTitle>
-              </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+            <div className="p-0">
+              <div className="flex flex-row items-start justify-between p-5 relative">
+                <div className="space-y-1">
+                  <div className="flex items-center space-x-2 mb-1">
+                    <div className="bg-orange-600 h-6 w-1 rounded-full"></div>
+                    <span className="text-sm font-semibold text-orange-600 uppercase tracking-wider">
+                      {campus.code}
+                    </span>
+                  </div>
+                  <h3 className="text-2xl font-bold text-orange-400">
+                    {campus.name}
+                  </h3>
+                </div>
+                <div className="flex space-x-1 absolute top-4 right-4">
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="text-gray-700 hover:text-gray-900"
-                  >
-                    <MoreHorizontal className="h-5 w-5" />
-                    <span className="sr-only">Actions</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="bg-white shadow-md rounded-md">
-                  <DropdownMenuItem
-                    className="cursor-pointer hover:bg-gray-100"
+                    className="rounded-full bg-white hover:bg-gray-100 text-blue-600 hover:text-blue-700 shadow-sm"
                     onClick={() => {
                       setSelectedCampus(campus);
                       setIsEditCampusDialogOpen(true);
                     }}
+                    aria-hidden="false"
                   >
-                    <Edit className="mr-2 h-4 w-4 text-gray-600" />
-                    Chỉnh sửa
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="cursor-pointer text-red-600 hover:bg-red-50"
+                    <Edit className="h-4 w-4" />
+                    <span className="sr-only">Edit</span>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-full bg-white hover:bg-gray-100 text-red-600 hover:text-red-700 shadow-sm"
                     onClick={() => {
                       setCampusToDelete(campus);
                       setIsDeleteDialogOpen(true);
                     }}
+                    aria-hidden="false"
                   >
-                    <Trash className="mr-2 h-4 w-4 text-red-600" />
-                    Xóa
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </CardHeader>
+                    <Trash className="h-4 w-4" />
+                    <span className="sr-only">Delete</span>
+                  </Button>
+                </div>
+              </div>
+            </div>
+
             <CampusForm
               isOpen={isEditCampusDialogOpen}
               onOpenChange={setIsEditCampusDialogOpen}
@@ -184,91 +172,55 @@ function CampusesContent(): React.ReactElement {
               onSubmitSuccess={fetchCampuses}
             />
 
-            <CardContent className="p-4">
+            <div className="p-5 flex-grow">
               <div className="space-y-4">
-                <div>
-                  <span className="text-sm font-medium text-gray-500">
-                    Địa chỉ:
-                  </span>
-                  <p className="mt-1 text-gray-700">{campus.address}</p>
+                <div className="flex items-start">
+                  <MapPin className="w-5 h-5 text-orange-500 mt-0.5 mr-2 flex-shrink-0" />
+                  <div>
+                    <span className="text-sm font-medium text-gray-500">
+                      Địa chỉ:
+                    </span>
+                    <p className="text-gray-700">
+                      {campus.address || "Chưa cập nhật"}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <span className="text-sm font-medium text-gray-500">
-                    Số điện thoại:
-                  </span>
-                  <p className="mt-1 text-gray-700">
-                    {campus.contact.phone || "Chưa cập nhật"}
-                  </p>
+                <div className="flex items-start">
+                  <Phone className="w-5 h-5 text-orange-500 mt-0.5 mr-2 flex-shrink-0" />
+                  <div>
+                    <span className="text-sm font-medium text-gray-500">
+                      Số điện thoại:
+                    </span>
+                    <p className="text-gray-700">
+                      {campus.contact.phone || "Chưa cập nhật"}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <span className="text-sm font-medium text-gray-500">
-                    Email:
-                  </span>
-                  <p className="mt-1 text-gray-700">
-                    {campus.contact.email || "Chưa cập nhật"}
-                  </p>
+                <div className="flex items-start">
+                  <Mail className="w-5 h-5 text-orange-500 mt-0.5 mr-2 flex-shrink-0" />
+                  <div>
+                    <span className="text-sm font-medium text-gray-500">
+                      Email:
+                    </span>
+                    <p className="text-gray-700">
+                      {campus.contact.email || "Chưa cập nhật"}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </CardContent>
-            <CardFooter className="flex justify-between items-center border-t pt-4 bg-gray-50 p-4">
-              <Button
-                className="bg-gradient-to-r from-orange-400 to-amber-500 hover:from-orange-500 hover:to-amber-600"
-                onClick={() => handleViewDormitoryDetails(campus.id)}
-              >
-                Xem Ký túc xá
-              </Button>
-            </CardFooter>
+            </div>
 
-            <Dialog
-              open={isDetailDialogOpen}
-              onOpenChange={setIsDetailDialogOpen}
-            >
-              <DialogContent className="fixed z-50 max-w-lg bg-white rounded-xl shadow-2xl border-none">
-                {selectedDormitory && (
-                  <div className="p-6 space-y-4">
-                    <div className="flex items-center space-x-4 border-b pb-4">
-                      <div className="bg-orange-100 p-3 rounded-full">
-                        <Building2 className="w-8 h-8 text-orange-500" />
-                      </div>
-                      <h3 className="text-xl font-bold text-gray-800">
-                        {selectedDormitory.name}
-                      </h3>
-                    </div>
-
-                    <p className="text-gray-600 italic">
-                      {selectedDormitory.description ||
-                        "Không có mô tả chi tiết"}
-                    </p>
-
-                    <div className="grid  gap-4 bg-gray-50 p-4 rounded-lg">
-                      <div className="flex items-center space-x-2">
-                        <MapPin className="w-5 h-5 text-orange-500" />
-                        <div>
-                          <strong className="text-sm text-gray-600">
-                            Địa chỉ
-                          </strong>
-                          <p className="text-gray-800">
-                            {selectedDormitory.campus.address ||
-                              "Chưa cập nhật"}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Users className="w-5 h-5 text-orange-500" />
-                        <div>
-                          <strong className="text-sm text-gray-600">
-                            Sức chứa
-                          </strong>
-                          <p className="text-gray-800">
-                            {selectedDormitory.capacity || "Chưa xác định"}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </DialogContent>
-            </Dialog>
+            <div className="bg-white border-t border-gray-200 mt-auto">
+              <div className="flex justify-center items-center p-4">
+                <Button
+                  className="w-full bg-orange-400 text-white hover:bg-orange-400 shadow-md hover:shadow-lg transition-all duration-300 px-5"
+                  onClick={() => handleViewDormitoryDetails(campus)}
+                >
+                  <Building2 className="mr-2 h-4 w-4" />
+                  Xem Ký túc xá
+                </Button>
+              </div>
+            </div>
 
             <DeleteDialog
               isOpen={isDeleteDialogOpen}
@@ -279,6 +231,12 @@ function CampusesContent(): React.ReactElement {
           </Card>
         ))}
       </div>
+
+      <DormitoryView
+        isOpen={isDetailDialogOpen}
+        onOpenChange={setIsDetailDialogOpen}
+        selectedCampus={selectedCampus}
+      />
     </div>
   );
 }

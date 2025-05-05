@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { campusesApi } from "@/api/resources/campuses"; // Import API
 import type { CampusCreateData } from "@/types/entities/campus";
+import { TriangleAlert } from "lucide-react";
 
 interface CampusFormProps {
   isOpen: boolean; // Trạng thái mở/đóng Dialog
@@ -30,7 +31,6 @@ export const CampusForm: React.FC<CampusFormProps> = ({
     name: "",
     code: "",
     address: "",
-    description: "",
     contact: {
       phone: "",
       email: "",
@@ -71,7 +71,18 @@ export const CampusForm: React.FC<CampusFormProps> = ({
         // Update campus
         if ("id" in initialData) {
           if (typeof initialData.id === "number") {
-            await campusesApi.update(initialData.id, formData);
+            // Create a clean data object without the id field
+            const cleanData = {
+              name: formData.name,
+              code: formData.code,
+              address: formData.address,
+              contact: {
+                phone: formData.contact.phone,
+                email: formData.contact.email,
+              },
+            };
+
+            await campusesApi.update(initialData.id, cleanData);
           } else {
             throw new Error("Invalid 'id' in initialData for update operation");
           }
@@ -137,18 +148,7 @@ export const CampusForm: React.FC<CampusFormProps> = ({
               placeholder="Nhập địa chỉ"
             />
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="description" className="text-right">
-              Mô tả
-            </Label>
-            <Input
-              id="description"
-              value={formData.description}
-              onChange={(e) => handleChange("description", e.target.value)}
-              className="col-span-3"
-              placeholder="Nhập mô tả"
-            />
-          </div>
+
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="phone" className="text-right">
               Số điện thoại
@@ -175,13 +175,18 @@ export const CampusForm: React.FC<CampusFormProps> = ({
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            aria-hidden="false"
+          >
             Hủy
           </Button>
           <Button
             type="submit"
             onClick={handleSubmit}
             className="bg-gradient-to-r from-orange-400 to-amber-500 hover:from-orange-500 hover:to-amber-600"
+            aria-hidden="false"
           >
             {initialData ? "Lưu thay đổi" : "Thêm cơ sở"}
           </Button>
@@ -207,21 +212,40 @@ export const DeleteDialog: React.FC<DeleteDialogProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="fixed z-50 max-w-lg bg-white rounded-xl shadow-2xl border-none">
-        <div className="p-6 space-y-4">
-          <h3 className="text-lg font-bold text-gray-800">Xác nhận xóa</h3>
-          <p className="text-gray-600">
-            Bạn có chắc chắn muốn xóa cơ sở "{campusName}" không? Hành động này
-            không thể hoàn tác.
-          </p>
-          <div className="flex justify-end space-x-2">
-            <Button variant="outline" onClick={onClose}>
+        <div className="p-6 space-y-5">
+          <div className="flex items-center space-x-3">
+            <div className="bg-red-100 p-2 rounded-full">
+              <TriangleAlert className="h-6 w-6 text-red-600" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-800">Xác nhận xóa</h3>
+          </div>
+
+          <div className="bg-red-50 p-4 rounded-lg border-l-4 border-red-500">
+            <p className="text-gray-700">
+              Bạn có chắc chắn muốn xóa cơ sở{" "}
+              <span className="font-semibold text-red-600">"{campusName}"</span>{" "}
+              không?
+            </p>
+            <p className="text-sm text-gray-500 mt-1">
+              Hành động này không thể hoàn tác.
+            </p>
+          </div>
+
+          <div className="flex justify-end space-x-3 pt-2">
+            <Button
+              variant="outline"
+              onClick={onClose}
+              className="border-gray-300 hover:bg-gray-100"
+              aria-hidden="false"
+            >
               Hủy
             </Button>
             <Button
-              className="bg-red-600 text-white hover:bg-red-700"
+              className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-md"
               onClick={onConfirm}
+              aria-hidden="false"
             >
-              Xóa
+              Xác nhận xóa
             </Button>
           </div>
         </div>
