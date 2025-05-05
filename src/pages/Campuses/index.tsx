@@ -89,11 +89,11 @@ function CampusesContent(): React.ReactElement {
     <div className="container mx-auto py-6 space-y-6">
       <div className="flex justify-between items-centers p-4 rounded-lg">
         <div className="flex items-center space-x-4">
-          <div className="bg-white p-3">
-            <HouseIcon className="h-6 w-6 text-orange-400" />
+          <div className="bg-gray-100 p-3 rounded-full">
+            <HouseIcon className="h-8 w-8 text-orange-600" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-orange-500">
+            <h1 className="text-3xl font-bold tracking-tight text-orange-600">
               Cơ sở Đào tạo
             </h1>
             <p className="text-gray-500 mt-1">
@@ -138,7 +138,7 @@ function CampusesContent(): React.ReactElement {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="rounded-full bg-white hover:bg-gray-100 text-blue-600 hover:text-blue-700 shadow-sm"
+                    className="rounded-full bg-gray-100 hover:bg-gray-300 text-blue-600 hover:text-blue-700 shadow-sm"
                     onClick={() => {
                       setSelectedCampus(campus);
                       setIsEditCampusDialogOpen(true);
@@ -151,7 +151,7 @@ function CampusesContent(): React.ReactElement {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="rounded-full bg-white hover:bg-gray-100 text-red-600 hover:text-red-700 shadow-sm"
+                    className="rounded-full bg-gray-100 hover:bg-gray-300 text-red-600 hover:text-red-700 shadow-sm"
                     onClick={() => {
                       setCampusToDelete(campus);
                       setIsDeleteDialogOpen(true);
