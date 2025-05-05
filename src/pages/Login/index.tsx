@@ -1,39 +1,34 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import logoAdmission from '../../assets/images/logo-admission.png';
-import logoFpt from '../../assets/images/logo-FPT.png';
-import loginBg from '../../assets/images/rightside login.png';
-import { 
-  User, 
-  KeyRound, 
-  Eye, 
-  EyeOff, 
-  AlertCircle,
-} from 'lucide-react';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import logoAdmission from "../../assets/images/logo-admission.png";
+import logoFpt from "../../assets/images/logo-FPT.png";
+import loginBg from "../../assets/images/rightside login.png";
+import { User, KeyRound, Eye, EyeOff, AlertCircle } from "lucide-react";
 
 const Login = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
-  
+  const [error, setError] = useState("");
+
   const navigate = useNavigate();
-  const location = useLocation();
+  // Không cần location vì không sử dụng redirectPath
+  // const location = useLocation();
   const { login, isLoading, error: authError, user } = useAuth();
-  
-  // Lấy đường dẫn redirect sau khi đăng nhập thành công
-  const redirectPath = (location.state as { from?: string })?.from || '/dashboard';
+
+  // Không cần redirectPath vì cả admin và staff đều chuyển hướng đến trang admission-methods
+  // const redirectPath = (location.state as { from?: string })?.from || "/dashboard";
 
   // Kiểm tra nếu có lỗi từ AuthContext
   useEffect(() => {
     if (authError) {
       // Xử lý thông báo lỗi từ API
-      if (authError.includes('Invalid username or password')) {
-        setError('Tên đăng nhập hoặc mật khẩu không đúng');
-      } else if (authError.includes('404')) {
-        setError('Không thể kết nối đến máy chủ (Lỗi 404)');
+      if (authError.includes("Invalid username or password")) {
+        setError("Tên đăng nhập hoặc mật khẩu không đúng");
+      } else if (authError.includes("404")) {
+        setError("Không thể kết nối đến máy chủ (Lỗi 404)");
       } else {
         setError(authError);
       }
@@ -42,58 +37,57 @@ const Login = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    
+    setError("");
+
     if (!username || !password) {
-      setError('Vui lòng nhập tên đăng nhập và mật khẩu');
+      setError("Vui lòng nhập tên đăng nhập và mật khẩu");
       return;
     }
-    
+
     try {
       // Gọi API đăng nhập thông qua AuthContext
       const success = await login(username, password);
-      
+
       if (success) {
         // Lấy thông tin người dùng từ context
         const userRole = user?.role;
-        console.log('Đăng nhập thành công, role:', userRole);
-        
+        console.log("Đăng nhập thành công, role:", userRole);
+
         // Lưu vào localStorage nếu chọn "remember me"
         if (rememberMe) {
-          localStorage.setItem('remember_username', username);
+          localStorage.setItem("remember_username", username);
         } else {
-          localStorage.removeItem('remember_username');
+          localStorage.removeItem("remember_username");
         }
-        
+
         // Lưu trạng thái đăng nhập vào sessionStorage
-        sessionStorage.setItem('isLoggedIn', 'true');
-        
+        sessionStorage.setItem("isLoggedIn", "true");
+
         // Chuyển hướng dựa trên quyền của người dùng
-        if (userRole === 'admin') {
-          navigate('/admin/dashboard', { replace: true });
-        } else if (userRole === 'staff') {
-          navigate('/staff/dashboard', { replace: true });
-        } else {
-          // Chuyển về trang mặc định hoặc trang được chỉ định
-          navigate(redirectPath, { replace: true });
-        }
+        // Cả admin và staff đều được chuyển hướng đến trang admission-methods mặc định
+        navigate("/admission-methods", { replace: true });
       }
       // Nếu không thành công, lỗi sẽ được xử lý trong AuthContext và hiển thị qua useEffect
     } catch (err) {
       // Xử lý lỗi kết nối hoặc lỗi không xác định
       if (err instanceof Error) {
-        if (err.message.includes('401')) {
+        if (err.message.includes("401")) {
           // Lỗi 401 là lỗi xác thực, thường là sai mật khẩu
-          setError('Tên đăng nhập hoặc mật khẩu không đúng');
-        } else if (err.message.includes('404')) {
-          setError('Không thể kết nối đến máy chủ (Lỗi 404)');
-        } else if (err.message.includes('network') || err.message.includes('Network')) {
-          setError('Lỗi kết nối mạng. Vui lòng kiểm tra kết nối internet của bạn.');
+          setError("Tên đăng nhập hoặc mật khẩu không đúng");
+        } else if (err.message.includes("404")) {
+          setError("Không thể kết nối đến máy chủ (Lỗi 404)");
+        } else if (
+          err.message.includes("network") ||
+          err.message.includes("Network")
+        ) {
+          setError(
+            "Lỗi kết nối mạng. Vui lòng kiểm tra kết nối internet của bạn."
+          );
         } else {
           setError(`Có lỗi xảy ra: ${err.message}`);
         }
       } else {
-        setError('Có lỗi xảy ra khi đăng nhập. Vui lòng thử lại sau.');
+        setError("Có lỗi xảy ra khi đăng nhập. Vui lòng thử lại sau.");
       }
       console.error(err);
     }
@@ -101,7 +95,7 @@ const Login = () => {
 
   // Tự động điền username nếu đã lưu
   useEffect(() => {
-    const savedUsername = localStorage.getItem('remember_username');
+    const savedUsername = localStorage.getItem("remember_username");
     if (savedUsername) {
       setUsername(savedUsername);
       setRememberMe(true);
@@ -115,18 +109,21 @@ const Login = () => {
         <div className="w-full max-w-md z-10 bg-white p-6 sm:p-8 rounded-xl shadow-lg">
           {/* Logo */}
           <div className="mb-6 flex justify-center">
-            <img 
-              src={logoAdmission} 
-              alt="FPT Admission" 
+            <img
+              src={logoAdmission}
+              alt="FPT Admission"
               className="h-16 sm:h-20 object-contain drop-shadow-md"
             />
           </div>
 
           {/* Tiêu đề */}
           <div className="text-center mb-6">
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Chào mừng quay lại!</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-800">
+              Chào mừng quay lại!
+            </h1>
             <p className="mt-1 text-sm sm:text-base">
-              Hãy <span className="text-orange-500 font-medium">Đăng Nhập</span> để vào hệ thống!!!
+              Hãy <span className="text-orange-500 font-medium">Đăng Nhập</span>{" "}
+              để vào hệ thống!!!
             </p>
           </div>
 
@@ -141,7 +138,7 @@ const Login = () => {
                 </div>
               </div>
             )}
-            
+
             {/* Tên đăng nhập */}
             <div>
               <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
@@ -203,7 +200,10 @@ const Login = () => {
                   onChange={(e) => setRememberMe(e.target.checked)}
                   className="h-4 w-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500"
                 />
-                <label htmlFor="remember-me" className="ml-2 block text-xs sm:text-sm text-gray-700">
+                <label
+                  htmlFor="remember-me"
+                  className="ml-2 block text-xs sm:text-sm text-gray-700"
+                >
                   Ghi nhớ đăng nhập
                 </label>
               </div>
@@ -217,14 +217,30 @@ const Login = () => {
             >
               {isLoading ? (
                 <>
-                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <svg
+                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
                   </svg>
                   Đang xử lý...
                 </>
               ) : (
-                'Đăng Nhập'
+                "Đăng Nhập"
               )}
             </button>
           </form>
@@ -243,33 +259,33 @@ const Login = () => {
               className="absolute inset-0 w-full h-full object-cover"
             />
           </div>
-          
+
           {/* Overlay gradient với các layer để tạo chiều sâu */}
           <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-black/30"></div>
-          
+
           {/* Layer mờ để tạo hiệu ứng sương mù nhẹ */}
           <div className="absolute inset-0 bg-black/10 backdrop-blur-[2px]"></div>
-          
+
           {/* Nội dung */}
           <div className="absolute inset-0 flex flex-col justify-center items-center">
             <div className="text-white text-center px-8 py-8 relative">
               {/* Vòng tròn hiệu ứng hào quang sau logo */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full bg-gradient-to-br from-[#F37021]/30 to-[#FF9D45]/10 blur-xl"></div>
-              
+
               {/* Logo */}
-              <img 
-                src={logoFpt} 
-                alt="FPT Education" 
+              <img
+                src={logoFpt}
+                alt="FPT Education"
                 className="h-24 mx-auto mb-8 object-contain drop-shadow-md relative z-10 animate-pulse-subtle"
               />
-              
+
               {/* Text với hiệu ứng text gradient */}
               <p className="text-2xl max-w-md mx-auto font-medium relative z-10">
                 <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent drop-shadow-md">
                   Hệ thống tuyển sinh trực tuyến Đại học FPT
                 </span>
               </p>
-              
+
               {/* Đường kẻ trang trí */}
               <div className="w-20 h-1 bg-gradient-to-r from-[#F37021] to-[#FF9D45] mx-auto mt-8 rounded-full"></div>
             </div>

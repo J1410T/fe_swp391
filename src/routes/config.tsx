@@ -35,10 +35,7 @@ export const routes: RouteObject[] = [
     ),
     errorElement: <ErrorBoundaryPage />,
     children: [
-      {
-        path: "dashboard",
-        element: dashboardRoute.element,
-      },
+      dashboardRoute,
       majorsRoute,
       admissionMethodsRoute,
       campusesRoute,

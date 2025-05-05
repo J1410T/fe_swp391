@@ -89,9 +89,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   // Filter sidebar items based on user role
   const filteredNavItems = React.useMemo(() => {
-    // If user is staff, filter out the user management option
+    // If user is staff, filter out the user management and dashboard options
     if (user?.role === "staff") {
-      return data.navMain.filter((item) => item.url !== "/users");
+      return data.navMain.filter(
+        (item) => item.url !== "/users" && item.url !== "/dashboard"
+      );
     }
     // For admin or other roles, show all items
     return data.navMain;
