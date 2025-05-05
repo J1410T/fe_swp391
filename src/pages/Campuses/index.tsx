@@ -59,11 +59,6 @@ function CampusesContent(): React.ReactElement {
     fetchCampuses();
   }, []);
 
-  const handleViewDormitoryDetails = (campusData: CampusResponse) => {
-    setSelectedCampus(campusData);
-    setIsDetailDialogOpen(true);
-  };
-
   const handleDeleteCampus = async () => {
     if (campusToDelete) {
       try {
@@ -102,7 +97,7 @@ function CampusesContent(): React.ReactElement {
           </div>
         </div>
         <Button
-          onClick={() => setIsAddCampusDialogOpen(true)}
+          onClick={() => setTimeout(() => setIsAddCampusDialogOpen(true), 0)}
           className="bg-orange-400 text-white hover:bg-orange-400 shadow-sm transition-all duration-300 px-5"
           aria-hidden="false"
         >
@@ -141,7 +136,7 @@ function CampusesContent(): React.ReactElement {
                     className="rounded-full bg-gray-100 hover:bg-gray-300 text-blue-600 hover:text-blue-700 shadow-sm"
                     onClick={() => {
                       setSelectedCampus(campus);
-                      setIsEditCampusDialogOpen(true);
+                      setTimeout(() => setIsEditCampusDialogOpen(true), 0);
                     }}
                     aria-hidden="false"
                   >
@@ -154,7 +149,7 @@ function CampusesContent(): React.ReactElement {
                     className="rounded-full bg-gray-100 hover:bg-gray-300 text-red-600 hover:text-red-700 shadow-sm"
                     onClick={() => {
                       setCampusToDelete(campus);
-                      setIsDeleteDialogOpen(true);
+                      setTimeout(() => setIsDeleteDialogOpen(true), 0);
                     }}
                     aria-hidden="false"
                   >
@@ -164,13 +159,6 @@ function CampusesContent(): React.ReactElement {
                 </div>
               </div>
             </div>
-
-            <CampusForm
-              isOpen={isEditCampusDialogOpen}
-              onOpenChange={setIsEditCampusDialogOpen}
-              initialData={selectedCampus}
-              onSubmitSuccess={fetchCampuses}
-            />
 
             <div className="p-5 flex-grow">
               <div className="space-y-4">
@@ -214,20 +202,16 @@ function CampusesContent(): React.ReactElement {
               <div className="flex justify-center items-center p-4">
                 <Button
                   className="w-full bg-orange-400 text-white hover:bg-orange-400 shadow-md hover:shadow-lg transition-all duration-300 px-5"
-                  onClick={() => handleViewDormitoryDetails(campus)}
+                  onClick={() => {
+                    setSelectedCampus(campus);
+                    setTimeout(() => setIsDetailDialogOpen(true), 0);
+                  }}
                 >
                   <Building2 className="mr-2 h-4 w-4" />
                   Xem Ký túc xá
                 </Button>
               </div>
             </div>
-
-            <DeleteDialog
-              isOpen={isDeleteDialogOpen}
-              onClose={() => setIsDeleteDialogOpen(false)}
-              onConfirm={handleDeleteCampus}
-              campusName={campusToDelete?.name}
-            />
           </Card>
         ))}
       </div>
@@ -236,6 +220,26 @@ function CampusesContent(): React.ReactElement {
         isOpen={isDetailDialogOpen}
         onOpenChange={setIsDetailDialogOpen}
         selectedCampus={selectedCampus}
+      />
+
+      <CampusForm
+        isOpen={isEditCampusDialogOpen}
+        onOpenChange={setIsEditCampusDialogOpen}
+        initialData={selectedCampus}
+        onSubmitSuccess={fetchCampuses}
+      />
+
+      <CampusForm
+        isOpen={isAddCampusDialogOpen}
+        onOpenChange={setIsAddCampusDialogOpen}
+        onSubmitSuccess={fetchCampuses}
+      />
+
+      <DeleteDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        onConfirm={handleDeleteCampus}
+        campusName={campusToDelete?.name}
       />
     </div>
   );

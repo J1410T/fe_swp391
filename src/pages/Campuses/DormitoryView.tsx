@@ -17,9 +17,10 @@ import {
 } from "@/components/ui/table";
 import { DormitoryForm } from "./DormitoryForm";
 import { DeleteDormitoryDialog } from "./DormitoryForm";
-import { Campus, Dormitory } from "@/types/campus";
+import { Campus } from "@/types/campus";
 import { dormitoriesApi } from "@/api/resources/dormitories";
 import { toast } from "sonner";
+import type { DormitoryResponse } from "@/types/entities/dormitory";
 
 interface DormitoryViewProps {
   isOpen: boolean;
@@ -32,19 +33,17 @@ export function DormitoryView({
   onOpenChange,
   selectedCampus,
 }: DormitoryViewProps) {
-  const [dormitories, setDormitories] = useState<Dormitory[]>([]);
+  const [dormitories, setDormitories] = useState<DormitoryResponse[]>([]);
   const [isAddDormitoryDialogOpen, setIsAddDormitoryDialogOpen] =
     useState(false);
   const [isEditDormitoryDialogOpen, setIsEditDormitoryDialogOpen] =
     useState(false);
   const [isDeleteDormitoryDialogOpen, setIsDeleteDormitoryDialogOpen] =
     useState(false);
-  const [selectedDormitory, setSelectedDormitory] = useState<Dormitory | null>(
-    null
-  );
-  const [dormitoryToDelete, setDormitoryToDelete] = useState<Dormitory | null>(
-    null
-  );
+  const [selectedDormitory, setSelectedDormitory] =
+    useState<DormitoryResponse | null>(null);
+  const [dormitoryToDelete, setDormitoryToDelete] =
+    useState<DormitoryResponse | null>(null);
 
   const fetchDormitories = async (campusId: number) => {
     try {
@@ -68,12 +67,12 @@ export function DormitoryView({
     setIsAddDormitoryDialogOpen(true);
   };
 
-  const handleEditDormitory = (dormitory: Dormitory) => {
+  const handleEditDormitory = (dormitory: DormitoryResponse) => {
     setSelectedDormitory(dormitory);
     setIsEditDormitoryDialogOpen(true);
   };
 
-  const handleDeleteDormitory = (dormitory: Dormitory) => {
+  const handleDeleteDormitory = (dormitory: DormitoryResponse) => {
     setDormitoryToDelete(dormitory);
     setIsDeleteDormitoryDialogOpen(true);
   };
@@ -103,7 +102,8 @@ export function DormitoryView({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[90vw] md:max-w-[80vw] lg:max-w-[70vw] xl:max-w-[60vw] bg-white rounded-xl shadow-2xl border-none p-0 overflow-hidden">
+        {/* <DialogContent className="max-w-4xl bg-white rounded-xl shadow-2xl border-none p-0 overflow-hidden"> */}
+        <DialogContent className="sm:max-w-[80vw] md:max-w-[70vw] lg:max-w-[60vw] xl:max-w-[50vw] bg-white rounded-xl shadow-2xl border-none p-0 overflow-hidden">
           <DialogTitle className="sr-only" />
           <DialogDescription />
           {selectedCampus && (

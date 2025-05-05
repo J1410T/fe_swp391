@@ -214,7 +214,9 @@ export const DeleteDialog: React.FC<DeleteDialogProps> = ({
 }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="fixed z-50 max-w-lg bg-white rounded-xl shadow-2xl border-none">
+      <DialogContent className="max-w-lg bg-white rounded-xl shadow-2xl border-none">
+        <DialogTitle className="sr-only" />
+        <DialogDescription />
         <div className="p-6 space-y-5">
           <div className="flex items-center space-x-3">
             <div className="bg-red-100 p-2 rounded-full">
