@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -106,6 +107,8 @@ export const CampusForm: React.FC<CampusFormProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent>
+        <DialogTitle className="sr-only" />
+        <DialogDescription />
         <DialogHeader>
           <DialogTitle>
             {initialData ? "Chỉnh sửa Cơ sở" : "Thêm Cơ sở Mới"}

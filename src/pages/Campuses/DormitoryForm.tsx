@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -97,6 +98,8 @@ export const DormitoryForm: React.FC<DormitoryFormProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
+        <DialogTitle className="sr-only" />
+        <DialogDescription />
         <DialogHeader>
           <DialogTitle>
             {initialData ? "Chỉnh sửa Ký túc xá" : "Thêm Ký túc xá Mới"}

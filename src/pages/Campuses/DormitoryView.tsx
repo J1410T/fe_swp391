@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Building2, Edit, Plus, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Table,
   TableBody,
@@ -99,6 +104,8 @@ export function DormitoryView({
     <>
       <Dialog open={isOpen} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-[90vw] md:max-w-[80vw] lg:max-w-[70vw] xl:max-w-[60vw] bg-white rounded-xl shadow-2xl border-none p-0 overflow-hidden">
+          <DialogTitle className="sr-only" />
+          <DialogDescription />
           {selectedCampus && (
             <div className="flex flex-col h-full max-h-[80vh]">
               <div className="flex items-center justify-between border-b pb-4 p-6 bg-white">
