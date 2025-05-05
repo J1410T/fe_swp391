@@ -85,7 +85,7 @@ function CampusesContent(): React.ReactElement {
       <div className="flex justify-between items-centers p-4 rounded-lg">
         <div className="flex items-center space-x-4">
           <div className="bg-gray-100 p-3 rounded-full">
-            <HouseIcon className="h-8 w-8 text-orange-600" />
+            <HouseIcon className="h-10 w-10 text-orange-600" />
           </div>
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-orange-600">
