@@ -19,7 +19,7 @@ export function useMajors() {
     items: [],
     total: 0,
     page: 1,
-    limit: 10,
+    limit: 9,
     totalPages: 1
   };
   
@@ -27,12 +27,13 @@ export function useMajors() {
   const [majorsData, setMajorsData] = useState<PaginatedResponse<Major>>(defaultData);
   const [pagination, setPagination] = useState<PaginationParams>({ 
     page: 1, 
-    limit: 10 
+    limit: 9 
   });
   const [searchQuery, setSearchQuery] = useState("");
   const [viewSheetOpen, setViewSheetOpen] = useState(false);
   const [editSheetOpen, setEditSheetOpen] = useState(false);
   const [selectedMajor, setSelectedMajor] = useState<Major | null>(null);
+  const [allMajors, setAllMajors] = useState<Major[]>([]);
   
   // Xử lý dữ liệu từ loader
   useEffect(() => {
@@ -44,15 +45,33 @@ export function useMajors() {
           ? loaderData.data.items.filter(item => item && item.id)
           : [];
         
+        // Lưu trữ toàn bộ dữ liệu để phân trang ở client
+        setAllMajors(validItems);
+        
+        // Tính toán thông tin phân trang
+        const totalItems = validItems.length;
+        const pageLimit = 9; // Giới hạn 9 card mỗi trang
+        const currentPage = 1; // Bắt đầu ở trang 1
+        const totalPages = Math.ceil(totalItems / pageLimit);
+        
+        // Lấy các items của trang đầu tiên
+        const startIndex = 0;
+        const endIndex = Math.min(pageLimit, totalItems);
+        const paginatedItems = validItems.slice(startIndex, endIndex);
+        
+        // Cập nhật state hiển thị
         setMajorsData({
-          ...loaderData.data,
-          items: validItems,
-          total: validItems.length
+          items: paginatedItems,
+          total: totalItems,
+          page: currentPage,
+          limit: pageLimit,
+          totalPages: totalPages
         });
         
+        // Đảm bảo pagination state đồng bộ với dữ liệu hiển thị
         setPagination({ 
-          page: loaderData.data.page || 1, 
-          limit: loaderData.data.limit || 10 
+          page: currentPage, 
+          limit: pageLimit 
         });
       }
     } catch (error) {
@@ -178,13 +197,25 @@ export function useMajors() {
           // Lọc để chỉ giữ lại các đối tượng hợp lệ
           const validItems = response.data.filter(item => item && item.id);
           
-          // Tạo cấu trúc dữ liệu phân trang từ mảng kết quả
+          // Lưu trữ toàn bộ dữ liệu để phân trang ở client
+          setAllMajors(validItems);
+          
+          // Tính toán thông tin phân trang
+          const totalItems = validItems.length;
+          const totalPages = Math.ceil(totalItems / pagination.limit);
+          
+          // Lấy các items của trang đầu tiên
+          const startIndex = 0; // Trang 1
+          const endIndex = Math.min(pagination.limit, totalItems);
+          const paginatedItems = validItems.slice(startIndex, endIndex);
+          
+          // Cập nhật state để hiển thị
           const paginatedData: PaginatedResponse<Major> = {
-            items: validItems,
-            total: validItems.length,
+            items: paginatedItems,
+            total: totalItems,
             page: 1,
             limit: pagination.limit,
-            totalPages: Math.ceil(validItems.length / pagination.limit)
+            totalPages: totalPages
           };
           setMajorsData(paginatedData);
           
@@ -203,10 +234,26 @@ export function useMajors() {
             ? paginatedResponse.items.filter(item => item && item.id)
             : [];
             
+          // Lưu trữ toàn bộ dữ liệu để phân trang ở client
+          setAllMajors(validItems);
+          
+          // Tính toán thông tin phân trang
+          const totalItems = validItems.length;
+          const totalPages = Math.ceil(totalItems / pagination.limit);
+          
+          // Lấy các items của trang đầu tiên
+          const startIndex = 0; // Trang 1
+          const endIndex = Math.min(pagination.limit, totalItems);
+          const paginatedItems = validItems.slice(startIndex, endIndex);
+          
+          // Cập nhật state để hiển thị
           const validData = {
             ...paginatedResponse,
-            items: validItems,
-            total: validItems.length
+            items: paginatedItems,
+            total: totalItems,
+            page: 1,
+            limit: pagination.limit,
+            totalPages: totalPages
           };
           
           setMajorsData(validData);
@@ -298,105 +345,30 @@ export function useMajors() {
     navigate("/majors/create");
   };
 
-  // Xử lý chuyển trang
-  const handlePageChange = async (page: number) => {
+  // Xử lý chuyển trang (phân trang phía client)
+  const handlePageChange = (page: number) => {
+    // Cập nhật state phân trang
     setPagination({ ...pagination, page });
     
-    try {
-      // Kiểm tra xem có đang tìm kiếm theo mã ngành (số) hay không
-      if (searchQuery && /^\d+$/.test(searchQuery.trim())) {
-        // Nếu đang tìm kiếm theo mã ngành, thử gọi API getById trước
-        try {
-          const detailResponse = await majorsApi.getById(parseInt(searchQuery.trim()));
-          if (detailResponse.success && detailResponse.data) {
-            // Nếu tìm thấy ngành học theo mã ngành, cập nhật lại state
-            const majorData = detailResponse.data;
-            
-            // Kiểm tra dữ liệu hợp lệ
-            if (majorData && majorData.id) {
-              // Tạo một mảng chứa ngành học đã tìm thấy
-              const paginatedData: PaginatedResponse<Major> = {
-                items: [majorData],
-                total: 1,
-                page: 1,
-                limit: pagination.limit,
-                totalPages: 1
-              };
-              
-              // Cập nhật trực tiếp vào state
-              setMajorsData(paginatedData);
-              return;
-            } else {
-              console.error('Dữ liệu ngành học không hợp lệ:', majorData);
-              // Tiếp tục với tìm kiếm thông thường
-            }
-          }
-        } catch (error) {
-          console.error("Lỗi khi tìm kiếm ngành học theo mã ngành khi chuyển trang:", error);
-          // Nếu không tìm thấy theo mã ngành, tiếp tục tìm kiếm thông thường
-        }
-      }
-      
-      // Xử lý tìm kiếm thông thường (cả khi không có nội dung tìm kiếm)
-      const apiParams: any = {
-        page: page,
-        limit: pagination.limit
-      };
-      
-      // Thêm tham số tìm kiếm nếu có
-      if (searchQuery) {
-        apiParams.name = searchQuery;
-      }
-      
-      // Gọi API để lấy dữ liệu trang mới
-      const response = await majorsApi.getAll(apiParams);
-      if (response.success) {
-        // Kiểm tra nếu dữ liệu trả về là mảng
-        if (Array.isArray(response.data)) {
-          // Lọc để chỉ giữ lại các đối tượng hợp lệ
-          const validItems = response.data.filter(item => item && item.id);
-          
-          // Tạo cấu trúc dữ liệu phân trang từ mảng
-          const paginatedData: PaginatedResponse<Major> = {
-            items: validItems,
-            total: validItems.length,
-            page: page,
-            limit: pagination.limit,
-            totalPages: Math.ceil(validItems.length / pagination.limit)
-          };
-          setMajorsData(paginatedData);
-        } else if (response.data && typeof response.data === 'object') {
-          // Nếu dữ liệu đã có cấu trúc phân trang, lọc items hợp lệ
-          const paginatedResponse = response.data as PaginatedResponse<Major>;
-          const validItems = Array.isArray(paginatedResponse.items) 
-            ? paginatedResponse.items.filter(item => item && item.id)
-            : [];
-            
-          const validData = {
-            ...paginatedResponse,
-            items: validItems,
-            total: validItems.length,
-            page: page
-          };
-          
-          setMajorsData(validData);
-        } else {
-          // Trường hợp không có dữ liệu
-          setMajorsData({
-            items: [],
-            total: 0,
-            page: page,
-            limit: pagination.limit,
-            totalPages: 0
-          });
-        }
-      } else {
-        toast.error(response.message || "Không thể lấy dữ liệu trang");
-      }
-    } catch (error) {
-      console.error("Lỗi khi chuyển trang:", error);
-      toast.error("Có lỗi xảy ra khi chuyển trang");
-    }
+    // Tính toán phân trang từ bộ dữ liệu đã lưu
+    const totalItems = allMajors.length;
+    const totalPages = Math.ceil(totalItems / pagination.limit);
+    
+    // Tính toán chỉ số bắt đầu và kết thúc cho trang được chọn
+    const startIndex = (page - 1) * pagination.limit;
+    const endIndex = Math.min(startIndex + pagination.limit, totalItems);
+    
+    // Lấy dữ liệu trang được chọn
+    const paginatedItems = allMajors.slice(startIndex, endIndex);
+    
+    // Cập nhật dữ liệu hiển thị
+    setMajorsData({
+      items: paginatedItems,
+      total: totalItems,
+      page: page,
+      limit: pagination.limit,
+      totalPages: totalPages
+    });
   };
 
   // Xử lý cập nhật thông tin ngành học
