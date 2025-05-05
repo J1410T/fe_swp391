@@ -13,7 +13,8 @@ import {
   AdmissionMethodsCards,
   AdmissionMethodForm,
   LoadingState,
-  ErrorState
+  ErrorState,
+  DeleteAdmissionMethodDialog
 } from "./";
 
 const AdmissionMethodsTab: React.FC = () => {
@@ -27,7 +28,9 @@ const AdmissionMethodsTab: React.FC = () => {
   // Dialog state
   const [isAddDialogOpen, setIsAddDialogOpen] = useState<boolean>(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState<boolean>(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [selectedMethod, setSelectedMethod] = useState<AdmissionMethod | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -167,11 +170,35 @@ const AdmissionMethodsTab: React.FC = () => {
     }
   };
 
-  // Handle delete admission method
+  // Open delete dialog
   const handleDelete = (method: AdmissionMethod) => {
-    // Implement delete functionality here
-    console.log("Delete method:", method.id);
-    toast.info("Chức năng xóa đang được phát triển");
+    setSelectedMethod(method);
+    setIsDeleteDialogOpen(true);
+  };
+
+  // Handle confirm delete admission method
+  const handleConfirmDelete = async () => {
+    if (!selectedMethod) return;
+
+    try {
+      setDeleteLoading(true);
+
+      // Call API to delete admission method
+      const response = await admissionMethodsApi.delete(selectedMethod.id.toString());
+
+      if (response.success) {
+        toast.success("Đã xóa phương thức tuyển sinh thành công");
+        setIsDeleteDialogOpen(false);
+        await fetchAdmissionMethods();
+      } else {
+        toast.error(response.message || "Không thể xóa phương thức tuyển sinh");
+      }
+    } catch (error) {
+      console.error("Lỗi khi xóa phương thức tuyển sinh:", error);
+      toast.error("Đã xảy ra lỗi khi xóa phương thức tuyển sinh");
+    } finally {
+      setDeleteLoading(false);
+    }
   };
 
   // Get campus name from code
@@ -289,6 +316,15 @@ const AdmissionMethodsTab: React.FC = () => {
           />
         </DialogContent>
       </Dialog>
+
+      {/* Dialog xác nhận xóa phương thức tuyển sinh */}
+      <DeleteAdmissionMethodDialog
+        isOpen={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        method={selectedMethod}
+        onConfirm={handleConfirmDelete}
+        isLoading={deleteLoading}
+      />
     </div>
   );
 };

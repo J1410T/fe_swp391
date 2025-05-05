@@ -6,3 +6,4 @@ export * from './AdmissionMethodForm';
 export * from './AdmissionMethodApplicationItem';
 export * from './LoadingState';
 export * from './ErrorState';
+export * from './DeleteAdmissionMethodDialog';
