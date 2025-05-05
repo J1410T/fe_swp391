@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLoaderData, useNavigate } from "react-router-dom";
+import { useLoaderData } from "react-router-dom";
 import type { MajorsLoaderResponse } from "@/types/loaders/major";
 import type { PaginatedResponse } from "@/types/api";
 import { Major } from "@/types/entities/major";
@@ -12,7 +12,6 @@ import { majorsApi } from "@/api/resources/majors";
  */
 export function useMajors() {
   const loaderData = useLoaderData<MajorsLoaderResponse>();
-  const navigate = useNavigate();
   
   // Mặc định dữ liệu trống nếu không có dữ liệu từ loader
   const defaultData: PaginatedResponse<Major> = {
@@ -32,8 +31,11 @@ export function useMajors() {
   const [searchQuery, setSearchQuery] = useState("");
   const [viewSheetOpen, setViewSheetOpen] = useState(false);
   const [editSheetOpen, setEditSheetOpen] = useState(false);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedMajor, setSelectedMajor] = useState<Major | null>(null);
   const [allMajors, setAllMajors] = useState<Major[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   
   // Xử lý dữ liệu từ loader
   useEffect(() => {
@@ -93,14 +95,61 @@ export function useMajors() {
 
   // Xử lý xóa ngành học
   const handleDelete = (major: Major) => {
-    // Trong thực tế, sẽ gọi API để xóa ngành học
-    
-    // Giả lập xóa thành công
-    toast.success(`Đã xóa ngành học ${major.name} thành công!`);
-    
-    // Cập nhật lại danh sách sau khi xóa
-    // Trong thực tế, có thể reload data hoặc cập nhật state
-    // navigate(0);
+    // Chọn ngành học để xóa và mở dialog xác nhận
+    setSelectedMajor(major);
+    setDeleteDialogOpen(true);
+  };
+  
+  // Xử lý sau khi xóa ngành học thành công
+  const handleMajorDeleted = async () => {
+    // Tải lại dữ liệu sau khi xóa thành công
+    setIsLoading(true);
+    try {
+      const response = await majorsApi.getAll();
+      if (response.success && response.data) {
+        // Xử lý dữ liệu trả về
+        let validItems: Major[] = [];
+        
+        if (Array.isArray(response.data)) {
+          validItems = response.data.filter(item => item && item.id);
+        } else if (response.data && typeof response.data === 'object') {
+          const paginatedResponse = response.data as PaginatedResponse<Major>;
+          validItems = Array.isArray(paginatedResponse.items) 
+            ? paginatedResponse.items.filter(item => item && item.id)
+            : [];
+        }
+        
+        // Cập nhật dữ liệu và áp dụng phân trang
+        setAllMajors(validItems);
+        
+        // Tính toán thông tin phân trang
+        const totalItems = validItems.length;
+        const totalPages = Math.ceil(totalItems / pagination.limit);
+        
+        // Kiểm tra trang hiện tại có vượt quá tổng số trang không
+        const currentPage = pagination.page > totalPages && totalPages > 0 ? totalPages : pagination.page;
+        setPagination({ ...pagination, page: currentPage });
+        
+        // Lấy dữ liệu trang hiện tại
+        const startIndex = (currentPage - 1) * pagination.limit;
+        const endIndex = Math.min(startIndex + pagination.limit, totalItems);
+        const paginatedItems = validItems.slice(startIndex, endIndex);
+        
+        // Cập nhật dữ liệu hiển thị
+        setMajorsData({
+          items: paginatedItems,
+          total: totalItems,
+          page: currentPage,
+          limit: pagination.limit,
+          totalPages: totalPages
+        });
+      }
+    } catch (error) {
+      console.error("Lỗi khi tải lại dữ liệu sau khi xóa:", error);
+      toast.error("Có lỗi xảy ra khi tải lại dữ liệu");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Xử lý tìm kiếm
@@ -342,7 +391,57 @@ export function useMajors() {
 
   // Xử lý thêm mới
   const handleAddNew = () => {
-    navigate("/majors/create");
+    setCreateDialogOpen(true);
+  };
+  
+  // Xử lý sau khi tạo ngành học mới thành công
+  const handleMajorCreated = async () => {
+    // Tải lại dữ liệu sau khi tạo mới thành công
+    setIsLoading(true);
+    try {
+      const response = await majorsApi.getAll();
+      if (response.success && response.data) {
+        // Xử lý dữ liệu trả về
+        let validItems: Major[] = [];
+        
+        if (Array.isArray(response.data)) {
+          validItems = response.data.filter(item => item && item.id);
+        } else if (response.data && typeof response.data === 'object') {
+          const paginatedResponse = response.data as PaginatedResponse<Major>;
+          validItems = Array.isArray(paginatedResponse.items) 
+            ? paginatedResponse.items.filter(item => item && item.id)
+            : [];
+        }
+        
+        // Cập nhật dữ liệu và áp dụng phân trang
+        setAllMajors(validItems);
+        
+        // Tính toán thông tin phân trang
+        const totalItems = validItems.length;
+        const totalPages = Math.ceil(totalItems / pagination.limit);
+        
+        // Lấy dữ liệu trang hiện tại
+        const startIndex = (pagination.page - 1) * pagination.limit;
+        const endIndex = Math.min(startIndex + pagination.limit, totalItems);
+        const paginatedItems = validItems.slice(startIndex, endIndex);
+        
+        // Cập nhật dữ liệu hiển thị
+        setMajorsData({
+          items: paginatedItems,
+          total: totalItems,
+          page: pagination.page,
+          limit: pagination.limit,
+          totalPages: totalPages
+        });
+        
+        toast.success("Dữ liệu đã được cập nhật");
+      }
+    } catch (error) {
+      console.error("Lỗi khi tải lại dữ liệu:", error);
+      toast.error("Có lỗi xảy ra khi tải lại dữ liệu");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Xử lý chuyển trang (phân trang phía client)
@@ -391,7 +490,10 @@ export function useMajors() {
     searchQuery,
     viewSheetOpen,
     editSheetOpen,
+    createDialogOpen,
+    deleteDialogOpen,
     selectedMajor,
+    isLoading,
     handleView,
     handleEdit,
     handleDelete,
@@ -401,8 +503,12 @@ export function useMajors() {
     handleUpdateMajor,
     handleSelectMajor,
     handleFilterByMajor,
+    handleMajorCreated,
+    handleMajorDeleted,
     setViewSheetOpen,
     setEditSheetOpen,
+    setCreateDialogOpen,
+    setDeleteDialogOpen,
     setSelectedMajor
   };
 }

@@ -9,7 +9,7 @@
  * 5. Hỗ trợ xem chi tiết, chỉnh sửa và xóa ngành học
  */
 
-import { Suspense, useState } from "react";
+import { Suspense } from "react";
 import { ErrorBoundary } from "@/components/common/error-boundary";
 import { Loading } from "@/components/common/loading";
 
@@ -17,6 +17,8 @@ import { Loading } from "@/components/common/loading";
 import { MajorSearch } from "./components/MajorSearch";
 import { ViewMajorSheet } from "./components/ViewMajorSheet";
 import { EditMajorSheet } from "./components/EditMajorSheet";
+import { CreateMajorForm } from "./components/CreateMajorForm";
+import { DeleteMajorDialog } from "./components/DeleteMajorDialog";
 import { TabNavigation } from "./components/TabNavigation";
 import { MajorsCardView } from "./components/MajorsCardView";
 import AdmissionMethodsTab from "./components/AdmissionMethodsTab";
@@ -34,9 +36,12 @@ function MajorsConfigContent(): React.ReactElement {
     pagination,
     viewSheetOpen,
     editSheetOpen,
+    createDialogOpen,
+    deleteDialogOpen,
     selectedMajor,
+    isLoading,
     activeTab,
-    handleView,
+
     handleEdit,
     handleDelete,
     handleSearch,
@@ -45,8 +50,12 @@ function MajorsConfigContent(): React.ReactElement {
     handleUpdateMajor,
     handleTabChange,
     handleSelectMajor,
+    handleMajorCreated,
+    handleMajorDeleted,
     setViewSheetOpen,
     setEditSheetOpen,
+    setCreateDialogOpen,
+    setDeleteDialogOpen,
     setSelectedMajor
   } = useMajorsConfig();
 
@@ -81,6 +90,21 @@ function MajorsConfigContent(): React.ReactElement {
         major={selectedMajor}
         onSave={handleUpdateMajor}
       />
+      
+      {/* Form tạo ngành học mới */}
+      <CreateMajorForm
+        isOpen={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+        onCreated={handleMajorCreated}
+      />
+      
+      {/* Dialog xóa ngành học */}
+      <DeleteMajorDialog
+        isOpen={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        major={selectedMajor}
+        onDeleted={handleMajorDeleted}
+      />
 
       {/* Nội dung tab */}
       {activeTab === "majors" ? (
@@ -100,6 +124,12 @@ function MajorsConfigContent(): React.ReactElement {
             onEdit={handleEdit}
             onDelete={handleDelete}
           />
+          
+          {isLoading && (
+            <div className="absolute inset-0 bg-white/50 flex items-center justify-center rounded-lg z-10">
+              <div className="animate-spin h-8 w-8 border-4 border-orange-400 rounded-full border-t-transparent"></div>
+            </div>
+          )}
         </div>
       ) : (
         <AdmissionMethodsTab />
