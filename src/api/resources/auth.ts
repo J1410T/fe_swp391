@@ -8,6 +8,7 @@ export interface User {
   username: string;
   email: string;
   role: 'admin' | 'staff' | 'user';
+  is_active?: boolean; // Optional as per API spec
 }
 
 /**
@@ -60,7 +61,7 @@ export const authApi = {
   login: (username: string, password: string) => {
     return api.post<LoginResponse>('/auth/login', { username, password });
   },
-  
+
   /**
    * Kiểm tra token hiện tại có hợp lệ không
    * @returns Promise với thông tin người dùng nếu token hợp lệ
@@ -68,7 +69,7 @@ export const authApi = {
   validateToken: () => {
     return api.get<{ data: { user: User }, success: boolean }>('/auth/me');
   },
-  
+
   /**
    * Làm mới token sử dụng refresh token hoặc token hiện tại
    * @returns Promise với token mới
@@ -76,12 +77,12 @@ export const authApi = {
   refreshToken: () => {
     const refreshToken = getRefreshToken();
     const currentToken = getToken();
-    
+
     // Nếu có refresh token, sử dụng nó
     if (refreshToken) {
       return api.post<RefreshTokenResponse>('/auth/refresh', { refreshToken });
     }
-    
+
     // Nếu không có refresh token nhưng có token hiện tại, dùng token hiện tại để xác thực
     if (currentToken) {
       // Trong trường hợp API không hỗ trợ refresh token, trả về một fake response với token hiện tại
@@ -94,10 +95,10 @@ export const authApi = {
         success: true
       });
     }
-    
+
     return Promise.reject(new Error('No token available'));
   },
-  
+
   /**
    * Đăng xuất
    * @returns Promise với kết quả đăng xuất
@@ -113,7 +114,7 @@ export const authApi = {
  */
 export const saveToken = (token: string): void => {
   if (!token) return;
-  
+
   const tokenData = {
     value: token,
     expiry: Date.now() + TOKEN_EXPIRY_TIME
@@ -137,10 +138,10 @@ export const saveRefreshToken = (refreshToken: string): void => {
 export const getToken = (): string | null => {
   const tokenData = localStorage.getItem('auth_token');
   if (!tokenData) return null;
-  
+
   try {
     const { value, expiry } = JSON.parse(tokenData);
-    
+
     // Kiểm tra token đã hết hạn chưa
     if (Date.now() > expiry) {
       // Token đã hết hạn, xóa khỏi localStorage
@@ -148,7 +149,7 @@ export const getToken = (): string | null => {
       removeToken();
       return null;
     }
-    
+
     return value;
   } catch (error) {
     // Nếu có lỗi khi parse, có thể token đang ở định dạng cũ
@@ -234,7 +235,7 @@ export const isAuthenticated = (): boolean => {
   const token = getToken();
   const user = getUser();
   const isLoggedInSession = sessionStorage.getItem('isLoggedIn') === 'true';
-  
+
   // Phải có cả token, user và session để coi là đã đăng nhập
   return !!token && !!user && isLoggedInSession;
 };

@@ -5,11 +5,11 @@ import {
   IconBuildingSkyscraper,
   IconCertificate,
   IconDashboard,
-  // IconUser,
+  IconUser,
   // IconHistory,
   // IconHelp,
 } from "@tabler/icons-react";
-import { Bolt } from 'lucide-react';
+import { Bolt } from "lucide-react";
 import { NavMain } from "@/components/layout/nav-main";
 // import { NavSecondary } from "@/components/layout/nav-secondary";
 import { NavUser } from "@/components/layout/nav-user";
@@ -19,6 +19,7 @@ import {
   SidebarFooter,
   SidebarHeader,
 } from "@/components/ui/sidebar";
+import { useAuth } from "@/contexts/AuthContext";
 
 /**
  * Data for the sidebar navigation
@@ -55,11 +56,11 @@ const data = {
     //   url: "/dormitories",
     //   icon: IconBuildingCommunity,
     // },
-    // {
-    //   title: "Quản lý người dùng",
-    //   url: "/users",
-    //   icon: IconUser,
-    // },
+    {
+      title: "Quản lý người dùng",
+      url: "/users",
+      icon: IconUser,
+    },
     // {
     //   title: "Phiên chatbot",
     //   url: "/chatbot-sessions",
@@ -84,6 +85,18 @@ const data = {
  * AppSidebar component for the FPTU Admissions Admin Dashboard
  */
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user } = useAuth();
+
+  // Filter sidebar items based on user role
+  const filteredNavItems = React.useMemo(() => {
+    // If user is staff, filter out the user management option
+    if (user?.role === "staff") {
+      return data.navMain.filter((item) => item.url !== "/users");
+    }
+    // For admin or other roles, show all items
+    return data.navMain;
+  }, [user?.role]);
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader className="py-6 border-b border-border/40">
@@ -101,7 +114,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </div>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={filteredNavItems} />
         {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
       </SidebarContent>
       <SidebarFooter>
