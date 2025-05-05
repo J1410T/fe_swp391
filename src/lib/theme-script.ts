@@ -1,22 +1,20 @@
 /**
  * Theme initialization script that runs before the app renders
- * This prevents flash of wrong theme on page load
+ * Always uses light theme
  */
 export function initializeTheme(): void {
   const script = `
     (function() {
       try {
-        const storedTheme = localStorage.getItem('theme');
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const theme = storedTheme || (prefersDark ? 'dark' : 'light');
-        
-        if (theme === 'dark') {
-          document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
+        // Always use light theme
+        document.documentElement.classList.remove('dark');
+
+        // Remove any stored theme preference
+        if (localStorage.getItem('theme')) {
+          localStorage.removeItem('theme');
         }
       } catch (e) {
-        // If localStorage is not available, fallback to light theme
+        // If localStorage is not available, still use light theme
         console.error('Failed to initialize theme:', e);
       }
     })();

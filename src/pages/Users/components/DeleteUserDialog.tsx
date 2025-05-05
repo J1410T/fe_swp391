@@ -88,9 +88,9 @@ export const DeleteUserDialog: React.FC<DeleteUserDialogProps> = ({
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="border-red-100 dark:border-red-900/30 shadow-lg">
+      <AlertDialogContent className="border-red-100 shadow-lg">
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-xl font-bold text-red-600 dark:text-red-500 flex items-center">
+          <AlertDialogTitle className="text-xl font-bold text-red-600 flex items-center">
             <Trash2 className="h-5 w-5 mr-2" />
             Xác nhận xóa người dùng
           </AlertDialogTitle>
@@ -100,7 +100,7 @@ export const DeleteUserDialog: React.FC<DeleteUserDialogProps> = ({
               {user.username}
             </span>
             ?
-            <div className="mt-4 p-3 bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-900/30 rounded-md text-red-800 dark:text-red-300">
+            <div className="mt-4 p-3 bg-red-50 border border-red-100 rounded-md text-red-800">
               <div className="flex items-start">
                 <div className="mr-3 mt-0.5">
                   <svg
@@ -132,7 +132,7 @@ export const DeleteUserDialog: React.FC<DeleteUserDialogProps> = ({
         <AlertDialogFooter className="mt-4 gap-2">
           <AlertDialogCancel
             disabled={isDeleting}
-            className="border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800 transition-colors"
+            className="border-gray-300 hover:bg-gray-100 transition-colors"
           >
             Hủy bỏ
           </AlertDialogCancel>

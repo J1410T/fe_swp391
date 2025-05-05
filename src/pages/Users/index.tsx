@@ -132,7 +132,7 @@ export function Users(): React.ReactElement {
   return (
     <div className="container mx-auto py-8 space-y-8 max-w-7xl">
       {/* Header Section with improved styling */}
-      <div className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20 rounded-lg p-6 shadow-sm border border-orange-100 dark:border-orange-900/30">
+      <div className="bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg p-6 shadow-sm border border-orange-100">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="space-y-2">
             <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-orange-500 to-amber-600 bg-clip-text text-transparent">
@@ -153,7 +153,7 @@ export function Users(): React.ReactElement {
       </div>
 
       {/* Search and Filter Section */}
-      <div className="bg-white dark:bg-gray-950 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-800">
+      <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="relative w-full sm:w-80 transition-all duration-200 focus-within:w-full sm:focus-within:w-96">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -168,7 +168,7 @@ export function Users(): React.ReactElement {
             variant="outline"
             onClick={fetchUsers}
             disabled={isLoading}
-            className="border-orange-200 hover:border-orange-400 hover:bg-orange-50 dark:hover:bg-orange-950/20 transition-all duration-200"
+            className="border-orange-200 hover:border-orange-400 hover:bg-orange-50 transition-all duration-200"
           >
             <RefreshCw
               className={`mr-2 h-4 w-4 ${
@@ -181,24 +181,24 @@ export function Users(): React.ReactElement {
       </div>
 
       {/* Table Section with improved styling */}
-      <div className="bg-white dark:bg-gray-950 rounded-lg shadow-md border border-gray-200 dark:border-gray-800 overflow-hidden">
+      <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <Table>
-            <TableHeader className="bg-gray-50 dark:bg-gray-900">
-              <TableRow className="hover:bg-gray-50 dark:hover:bg-gray-900">
-                <TableHead className="font-semibold text-gray-700 dark:text-gray-300">
+            <TableHeader className="bg-gray-50">
+              <TableRow className="hover:bg-gray-50">
+                <TableHead className="font-semibold text-gray-700">
                   Tên đăng nhập
                 </TableHead>
-                <TableHead className="font-semibold text-gray-700 dark:text-gray-300">
+                <TableHead className="font-semibold text-gray-700">
                   Email
                 </TableHead>
-                <TableHead className="font-semibold text-gray-700 dark:text-gray-300">
+                <TableHead className="font-semibold text-gray-700">
                   Vai trò
                 </TableHead>
-                <TableHead className="font-semibold text-gray-700 dark:text-gray-300">
+                <TableHead className="font-semibold text-gray-700">
                   Trạng thái
                 </TableHead>
-                <TableHead className="text-right font-semibold text-gray-700 dark:text-gray-300">
+                <TableHead className="text-right font-semibold text-gray-700">
                   Thao tác
                 </TableHead>
               </TableRow>
@@ -241,12 +241,12 @@ export function Users(): React.ReactElement {
                 filteredUsers.map((user) => (
                   <TableRow
                     key={user.id}
-                    className="hover:bg-orange-50 dark:hover:bg-orange-950/10 transition-colors duration-150"
+                    className="hover:bg-orange-50 transition-colors duration-150"
                   >
                     <TableCell className="font-medium">
                       {user.username}
                     </TableCell>
-                    <TableCell className="text-gray-600 dark:text-gray-400">
+                    <TableCell className="text-gray-600">
                       {user.email}
                     </TableCell>
                     <TableCell>{getRoleBadge(user.role)}</TableCell>
@@ -276,7 +276,7 @@ export function Users(): React.ReactElement {
                           size="sm"
                           onClick={() => handleEdit(user)}
                           title="Chỉnh sửa"
-                          className="hover:bg-orange-100 dark:hover:bg-orange-950/30 text-gray-700 dark:text-gray-300 hover:text-orange-600 transition-colors"
+                          className="hover:bg-orange-100 text-gray-700 hover:text-orange-600 transition-colors"
                         >
                           <Edit className="h-4 w-4 mr-1" />
                           Sửa
@@ -285,7 +285,7 @@ export function Users(): React.ReactElement {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleDelete(user)}
-                          className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                          className="text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors"
                           title="Xóa"
                         >
                           <Trash2 className="h-4 w-4 mr-1" />
@@ -302,7 +302,7 @@ export function Users(): React.ReactElement {
 
         {/* Table footer with pagination or summary */}
         {!isLoading && filteredUsers.length > 0 && (
-          <div className="px-4 py-3 border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm text-gray-500 dark:text-gray-400">
+          <div className="px-4 py-3 border-t border-gray-200 bg-gray-50 text-sm text-gray-500">
             Hiển thị {filteredUsers.length} người dùng{" "}
             {searchTerm ? "phù hợp với tìm kiếm" : ""}
           </div>

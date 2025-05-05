@@ -251,7 +251,7 @@ export const UserForm: React.FC<UserFormProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[550px] border-orange-100 dark:border-orange-900/30 shadow-lg">
+      <DialogContent className="sm:max-w-[550px] border-orange-100 shadow-lg">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold bg-gradient-to-r from-orange-500 to-amber-600 bg-clip-text text-transparent flex items-center">
             {initialData ? (
@@ -277,7 +277,7 @@ export const UserForm: React.FC<UserFormProps> = ({
           <div className="grid grid-cols-4 items-center gap-4">
             <Label
               htmlFor="username"
-              className="text-right font-medium text-gray-700 dark:text-gray-300"
+              className="text-right font-medium text-gray-700"
             >
               Tên đăng nhập <span className="text-red-500">*</span>
             </Label>
@@ -294,7 +294,7 @@ export const UserForm: React.FC<UserFormProps> = ({
             <div className="grid grid-cols-4 items-center gap-4">
               <Label
                 htmlFor="password"
-                className="text-right font-medium text-gray-700 dark:text-gray-300"
+                className="text-right font-medium text-gray-700"
               >
                 Mật khẩu <span className="text-red-500">*</span>
               </Label>
@@ -313,7 +313,7 @@ export const UserForm: React.FC<UserFormProps> = ({
             <div className="grid grid-cols-4 items-center gap-4">
               <Label
                 htmlFor="newPassword"
-                className="text-right font-medium text-gray-700 dark:text-gray-300"
+                className="text-right font-medium text-gray-700"
               >
                 Mật khẩu mới
               </Label>
@@ -336,7 +336,7 @@ export const UserForm: React.FC<UserFormProps> = ({
           <div className="grid grid-cols-4 items-center gap-4">
             <Label
               htmlFor="email"
-              className="text-right font-medium text-gray-700 dark:text-gray-300"
+              className="text-right font-medium text-gray-700"
             >
               Email <span className="text-red-500">*</span>
             </Label>
@@ -353,7 +353,7 @@ export const UserForm: React.FC<UserFormProps> = ({
           <div className="grid grid-cols-4 items-center gap-4">
             <Label
               htmlFor="role"
-              className="text-right font-medium text-gray-700 dark:text-gray-300"
+              className="text-right font-medium text-gray-700"
             >
               Vai trò <span className="text-red-500">*</span>
             </Label>
@@ -391,7 +391,7 @@ export const UserForm: React.FC<UserFormProps> = ({
           <div className="grid grid-cols-4 items-center gap-4">
             <Label
               htmlFor="is_active"
-              className="text-right font-medium text-gray-700 dark:text-gray-300"
+              className="text-right font-medium text-gray-700"
             >
               Trạng thái
             </Label>
@@ -416,12 +416,12 @@ export const UserForm: React.FC<UserFormProps> = ({
                   }`}
                 >
                   {formData.is_active === true ? (
-                    <span className="flex items-center text-green-600 dark:text-green-500">
+                    <span className="flex items-center text-green-600">
                       <CheckCircle className="w-4 h-4 mr-1.5" />
                       Hoạt động
                     </span>
                   ) : (
-                    <span className="flex items-center text-gray-600 dark:text-gray-400">
+                    <span className="flex items-center text-gray-600">
                       <XCircle className="w-4 h-4 mr-1.5" />
                       Vô hiệu hóa
                     </span>
@@ -429,7 +429,7 @@ export const UserForm: React.FC<UserFormProps> = ({
                 </Label>
               </div>
               {isCurrentAdmin && (
-                <div className="mt-2 text-xs text-amber-600 dark:text-amber-500 flex items-center">
+                <div className="mt-2 text-xs text-amber-600 flex items-center">
                   <AlertCircle className="w-3.5 h-3.5 mr-1.5" />
                   Không thể thay đổi trạng thái của tài khoản admin đang đăng
                   nhập
@@ -444,7 +444,7 @@ export const UserForm: React.FC<UserFormProps> = ({
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={isSubmitting}
-            className="border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800 transition-colors"
+            className="border-gray-300 hover:bg-gray-100 transition-colors"
           >
             Hủy bỏ
           </Button>
