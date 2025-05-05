@@ -89,11 +89,11 @@ export const AdmissionMethodsCards: React.FC<AdmissionMethodsCardsProps> = ({
               key={method.id}
               variants={cardVariants}
               whileHover="hover"
-              className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden"
+              className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden flex flex-col h-full"
               layoutId={`card-${method.id}`}
             >
               <motion.div
-                className="p-5 border-b border-gray-200 bg-gradient-to-r from-orange-50 to-amber-50 flex items-center"
+                className="p-5 border-b border-gray-200 bg-gradient-to-r from-orange-50 to-amber-50 flex items-center flex-shrink-0"
               >
                 <motion.div
                   className="bg-white p-2 rounded-full mr-3 shadow-sm"
@@ -111,7 +111,7 @@ export const AdmissionMethodsCards: React.FC<AdmissionMethodsCardsProps> = ({
                 </motion.div>
               </motion.div>
 
-              <div className="p-5">
+              <div className="p-5 flex-grow flex flex-col">
                 <p className="text-gray-600 text-sm mb-4 line-clamp-3">{method.description}</p>
 
                 <motion.a
@@ -128,7 +128,7 @@ export const AdmissionMethodsCards: React.FC<AdmissionMethodsCardsProps> = ({
 
                 {/* Phần cấu hình - luôn hiển thị dù có hay không có cấu hình */}
                 <motion.div
-                  className="border-t border-gray-100 pt-4 mt-4 min-h-[120px]"
+                  className="border-t border-gray-100 pt-4 mt-4 flex-grow flex flex-col"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3 }}
@@ -139,26 +139,30 @@ export const AdmissionMethodsCards: React.FC<AdmissionMethodsCardsProps> = ({
                   </div>
 
                   {method.applications && method.applications.length > 0 ? (
-                    <ul className="space-y-2">
-                      {method.applications.map((app: AdmissionMethodApplication, index: number) => (
-                        <motion.div
-                          key={index}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 0.1 * index }}
-                        >
-                          <AdmissionMethodApplicationItem
-                            application={app}
-                            index={index}
-                            getCampusName={getCampusName}
-                            getMajorName={getMajorName}
-                          />
-                        </motion.div>
-                      ))}
-                    </ul>
+                    <div className={method.applications.length > 1 ? "overflow-visible max-h-[120px] pr-1 overflow-y-auto scrollbar-thin scrollbar-thumb-orange-300 scrollbar-track-gray-100" : ""}>
+                      <ul className="space-y-2">
+                        {method.applications.map((app: AdmissionMethodApplication, index: number) => (
+                          <div className="overflow-visible" key={index}>
+                            <motion.div
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: 0.1 * index }}
+                              className="overflow-visible"
+                            >
+                              <AdmissionMethodApplicationItem
+                                application={app}
+                                index={index}
+                                getCampusName={getCampusName}
+                                getMajorName={getMajorName}
+                              />
+                            </motion.div>
+                          </div>
+                        ))}
+                      </ul>
+                    </div>
                   ) : (
                     <motion.div
-                      className="flex flex-col items-center justify-center py-4 px-3 bg-gray-50 rounded-lg border border-dashed border-gray-200"
+                      className="flex flex-col items-center justify-center py-4 px-3 bg-gray-50 rounded-lg border border-dashed border-gray-200 flex-grow"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.3 }}
@@ -172,7 +176,7 @@ export const AdmissionMethodsCards: React.FC<AdmissionMethodsCardsProps> = ({
               </div>
 
               <motion.div
-                className="bg-gray-50 px-5 py-3 border-t border-gray-200 flex justify-end space-x-2"
+                className="bg-gray-50 px-5 py-3 border-t border-gray-200 flex justify-end space-x-2 flex-shrink-0 mt-auto"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
