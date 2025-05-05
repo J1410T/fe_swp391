@@ -13,3 +13,4 @@ export * from './resources/scholarships';
 export * from './resources/dormitories';
 export * from './resources/academic-years';
 export * from './resources/users';
+export * from './resources/dashboard';
