@@ -1,4 +1,29 @@
 /**
+ * Thông tin ứng dụng của phương thức tuyển sinh
+ */
+export interface AdmissionMethodApplication {
+  /** Điểm tối thiểu */
+  min_score?: number | null;
+  /** Ghi chú */
+  note?: string;
+  /** Thông tin ngành học */
+  major?: {
+    /** Mã ngành */
+    code?: string;
+  } | null;
+  /** Thông tin cơ sở */
+  campus?: {
+    /** Mã cơ sở */
+    code?: string;
+  };
+  /** Thông tin năm học */
+  academicYear?: {
+    /** Năm học */
+    year?: number;
+  };
+}
+
+/**
  * Thông tin phương thức tuyển sinh
  */
 export interface AdmissionMethod {
@@ -10,6 +35,8 @@ export interface AdmissionMethod {
   description: string;
   /** URL đăng ký */
   application_url: string;
+  /** Danh sách ứng dụng của phương thức tuyển sinh */
+  applications?: AdmissionMethodApplication[];
   /** Mã phương thức tuyển sinh (tùy chọn) */
   code?: string;
   /** Năm học áp dụng (tùy chọn) */

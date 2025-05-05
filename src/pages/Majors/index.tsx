@@ -1,6 +1,6 @@
 /**
  * Trang Cấu hình ngành học
- * 
+ *
  * Chức năng:
  * 1. Hiển thị 2 tab: "Quản lý Ngành học" và "Phương thức Tuyển sinh"
  * 2. Tab Ngành học: Hiển thị danh sách ngành học với các thông tin chi tiết
@@ -21,7 +21,7 @@ import { CreateMajorForm } from "./components/CreateMajorForm";
 import { DeleteMajorDialog } from "./components/DeleteMajorDialog";
 import { TabNavigation } from "./components/TabNavigation";
 import { MajorsCardView } from "./components/MajorsCardView";
-import AdmissionMethodsTab from "./components/AdmissionMethodsTab";
+import { AdmissionMethodsTab } from "./components";
 
 // Hooks
 import { useMajorsConfig } from "./hooks/useMajorsConfig";
@@ -75,29 +75,29 @@ function MajorsConfigContent(): React.ReactElement {
         {/* Tab Navigation */}
         <TabNavigation activeTab={activeTab} onTabChange={handleTabChange} />
       </div>
-      
+
       {/* Sheet xem chi tiết ngành học */}
-      <ViewMajorSheet 
+      <ViewMajorSheet
         isOpen={viewSheetOpen}
         onOpenChange={setViewSheetOpen}
         major={selectedMajor}
       />
-      
+
       {/* Sheet chỉnh sửa ngành học */}
-      <EditMajorSheet 
+      <EditMajorSheet
         isOpen={editSheetOpen}
         onOpenChange={setEditSheetOpen}
         major={selectedMajor}
         onSave={handleUpdateMajor}
       />
-      
+
       {/* Form tạo ngành học mới */}
       <CreateMajorForm
         isOpen={createDialogOpen}
         onOpenChange={setCreateDialogOpen}
         onCreated={handleMajorCreated}
       />
-      
+
       {/* Dialog xóa ngành học */}
       <DeleteMajorDialog
         isOpen={deleteDialogOpen}
@@ -109,14 +109,14 @@ function MajorsConfigContent(): React.ReactElement {
       {/* Nội dung tab */}
       {activeTab === "majors" ? (
         <div className="bg-white rounded-lg p-6 shadow-sm">
-          <MajorSearch 
-            onSearch={handleSearch} 
-            onAddNew={handleAddNew} 
+          <MajorSearch
+            onSearch={handleSearch}
+            onAddNew={handleAddNew}
             onSelectMajor={handleSelectMajor}
           />
 
           <MajorsCardView
-            majors={majorsData.items.filter(major => major !== null && major !== undefined && major.id)} 
+            majors={majorsData.items.filter(major => major !== null && major !== undefined && major.id)}
             totalItems={majorsData.total}
             pagination={pagination}
             onPageChange={handlePageChange}
@@ -124,7 +124,7 @@ function MajorsConfigContent(): React.ReactElement {
             onEdit={handleEdit}
             onDelete={handleDelete}
           />
-          
+
           {isLoading && (
             <div className="absolute inset-0 bg-white/50 flex items-center justify-center rounded-lg z-10">
               <div className="animate-spin h-8 w-8 border-4 border-orange-400 rounded-full border-t-transparent"></div>
@@ -136,7 +136,7 @@ function MajorsConfigContent(): React.ReactElement {
       )}
 
       {/* Dialog chi tiết ngành học */}
-            
+
     </div>
   );
 }
