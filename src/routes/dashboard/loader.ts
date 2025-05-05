@@ -1,5 +1,6 @@
 import { LoaderFunction } from 'react-router-dom';
 import { DashboardData, DashboardLoaderResponse } from './types';
+import { dashboardApi } from '@/api/resources/dashboard';
 
 /**
  * Loads dashboard data from API
@@ -7,20 +8,22 @@ import { DashboardData, DashboardLoaderResponse } from './types';
  */
 export const loadDashboardData: LoaderFunction = async (): Promise<DashboardLoaderResponse> => {
   try {
-    // Simulate API call
-    const data = await new Promise<DashboardData>(resolve => 
-      setTimeout(() => resolve({ 
-        stats: {
-          totalMajors: 24,
-          totalCampuses: 5,
-          totalScholarships: 18,
-          totalDormitories: 12
-        } 
-      }), 100)
-    );
+    // Get overall stats from API
+    const overallStatsResponse = await dashboardApi.getOverallStats();
+
+    // Map API response to our loader data format
+    const data: DashboardData = {
+      stats: {
+        totalMajors: overallStatsResponse.data.total_majors,
+        totalCampuses: overallStatsResponse.data.total_campuses,
+        totalScholarships: overallStatsResponse.data.total_scholarships,
+        totalDormitories: overallStatsResponse.data.total_dormitories
+      }
+    };
 
     return { data };
   } catch (error) {
+    console.error('Failed to load dashboard data:', error);
     throw new Error('Failed to load dashboard data');
   }
 };
