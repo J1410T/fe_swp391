@@ -12,20 +12,26 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
-import { AddCampus } from "./AddCampus";
+// import { AddCampus } from "./AddCampus";
 import { dormitoriesApi } from "@/api/resources/dormitories";
 import type { DormitoryResponse } from "@/types/entities/dormitory";
-import { Building2, MapPin, Users } from "lucide-react";
+import {
+  Building2,
+  Edit,
+  MapPin,
+  MoreHorizontal,
+  Trash,
+  Users,
+} from "lucide-react";
 import { DialogContent, Dialog } from "@/components/ui/dialog";
+import { CampusForm, DeleteDialog } from "./CampusForm";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 /**
  * Component nội dung của trang Campuses
@@ -40,7 +46,15 @@ function CampusesContent(): React.ReactElement {
   const [selectedDormitory, setSelectedDormitory] =
     useState<DormitoryResponse | null>(null);
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
+  const [selectedCampus, setSelectedCampus] = useState<CampusResponse | null>(
+    null
+  );
   const [isAddCampusDialogOpen, setIsAddCampusDialogOpen] = useState(false);
+  const [isEditCampusDialogOpen, setIsEditCampusDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [campusToDelete, setCampusToDelete] = useState<CampusResponse | null>(
+    null
+  );
 
   const fetchCampuses = async () => {
     try {
@@ -73,6 +87,19 @@ function CampusesContent(): React.ReactElement {
     }
   };
 
+  const handleDeleteCampus = async () => {
+    if (campusToDelete) {
+      try {
+        await campusesApi.delete(campusToDelete.id);
+        fetchCampuses();
+        setIsDeleteDialogOpen(false);
+        setCampusToDelete(null);
+      } catch (error) {
+        console.error("Error deleting campus:", error);
+      }
+    }
+  };
+
   if (isLoading) {
     return <Loading />;
   }
@@ -96,10 +123,10 @@ function CampusesContent(): React.ReactElement {
         >
           Thêm cơ sở mới
         </Button>
-        <AddCampus
+        <CampusForm
           isOpen={isAddCampusDialogOpen}
           onOpenChange={setIsAddCampusDialogOpen}
-          onCampusAdded={fetchCampuses}
+          onSubmitSuccess={fetchCampuses}
         />
       </div>
       <Separator />
@@ -107,33 +134,88 @@ function CampusesContent(): React.ReactElement {
         {campuses.map((campus) => (
           <Card
             key={campus.id}
-            className="overflow-hidden hover:shadow-md transition-shadow"
+            className="overflow-hidden hover:shadow-xl transition-shadow rounded-lg border border-gray-300 bg-white"
           >
-            <CardHeader className="bg-gradient-to-r ">
-              <CardTitle className="text-xl font-semibold">
-                {campus.name}
-              </CardTitle>
+            <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-4 bg-gradient-to-r from-indigo-50 to-indigo-100 p-4">
+              <div className="space-y-1">
+                <CardTitle className="text-xl font-bold text-gray-900">
+                  {campus.name}
+                </CardTitle>
+              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-gray-700 hover:text-gray-900"
+                  >
+                    <MoreHorizontal className="h-5 w-5" />
+                    <span className="sr-only">Actions</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-white shadow-md rounded-md">
+                  <DropdownMenuItem
+                    className="cursor-pointer hover:bg-gray-100"
+                    onClick={() => {
+                      setSelectedCampus(campus);
+                      setIsEditCampusDialogOpen(true);
+                    }}
+                  >
+                    <Edit className="mr-2 h-4 w-4 text-gray-600" />
+                    Chỉnh sửa
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="cursor-pointer text-red-600 hover:bg-red-50"
+                    onClick={() => {
+                      setCampusToDelete(campus);
+                      setIsDeleteDialogOpen(true);
+                    }}
+                  >
+                    <Trash className="mr-2 h-4 w-4 text-red-600" />
+                    Xóa
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </CardHeader>
-            <CardContent className="pt-6">
-              <div className="space-y-3">
+            <CampusForm
+              isOpen={isEditCampusDialogOpen}
+              onOpenChange={setIsEditCampusDialogOpen}
+              initialData={selectedCampus}
+              onSubmitSuccess={fetchCampuses}
+            />
+
+            <CardContent className="p-4">
+              <div className="space-y-4">
                 <div>
                   <span className="text-sm font-medium text-gray-500">
                     Địa chỉ:
                   </span>
-                  <p className="mt-1">{campus.address}</p>
+                  <p className="mt-1 text-gray-700">{campus.address}</p>
+                </div>
+                <div>
+                  <span className="text-sm font-medium text-gray-500">
+                    Số điện thoại:
+                  </span>
+                  <p className="mt-1 text-gray-700">
+                    {campus.contact.phone || "Chưa cập nhật"}
+                  </p>
+                </div>
+                <div>
+                  <span className="text-sm font-medium text-gray-500">
+                    Email:
+                  </span>
+                  <p className="mt-1 text-gray-700">
+                    {campus.contact.email || "Chưa cập nhật"}
+                  </p>
                 </div>
               </div>
             </CardContent>
-            <CardFooter className="flex justify-between border-t pt-4 bg-gray-50">
+            <CardFooter className="flex justify-between items-center border-t pt-4 bg-gray-50 p-4">
               <Button
-                variant="outline"
-                className="text-gray-700 border-gray-300 hover:bg-gray-100"
+                className="bg-gradient-to-r from-orange-400 to-amber-500 hover:from-orange-500 hover:to-amber-600"
                 onClick={() => handleViewDormitoryDetails(campus.id)}
               >
                 Xem Ký túc xá
-              </Button>
-              <Button className="bg-gradient-to-r from-orange-400 to-amber-500 hover:from-orange-500 hover:to-amber-600">
-                Chỉnh sửa
               </Button>
             </CardFooter>
 
@@ -171,7 +253,6 @@ function CampusesContent(): React.ReactElement {
                           </p>
                         </div>
                       </div>
-
                       <div className="flex items-center space-x-2">
                         <Users className="w-5 h-5 text-orange-500" />
                         <div>
@@ -184,22 +265,17 @@ function CampusesContent(): React.ReactElement {
                         </div>
                       </div>
                     </div>
-
-                    {/* <DialogFooter className="flex justify-end space-x-2 pt-4 border-t">
-                      <Button
-                        variant="outline"
-                        className="text-gray-600 hover:bg-gray-100"
-                      >
-                        Đóng
-                      </Button>
-                      <Button className="bg-gradient-to-r from-orange-400 to-amber-500 text-white hover:from-orange-500 hover:to-amber-600">
-                        Chi tiết
-                      </Button>
-                    </DialogFooter> */}
                   </div>
                 )}
               </DialogContent>
             </Dialog>
+
+            <DeleteDialog
+              isOpen={isDeleteDialogOpen}
+              onClose={() => setIsDeleteDialogOpen(false)}
+              onConfirm={handleDeleteCampus}
+              campusName={campusToDelete?.name}
+            />
           </Card>
         ))}
       </div>
