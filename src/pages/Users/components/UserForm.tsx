@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -9,6 +9,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 import {
   usersApi,
@@ -33,6 +34,7 @@ import {
   RefreshCw,
   Save,
   AlertCircle,
+  X,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -64,6 +66,30 @@ export const UserForm: React.FC<UserFormProps> = ({
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [formState, setFormState] = useState<
+    "idle" | "submitting" | "success" | "error"
+  >("idle");
+
+  // Theo dõi các trường có lỗi
+  const [fieldErrors, setFieldErrors] = useState<{
+    username?: boolean;
+    password?: boolean;
+    email?: boolean;
+    role?: boolean;
+  }>({});
+
+  // State để theo dõi việc kiểm tra tên đăng nhập
+  const [isCheckingUsername, setIsCheckingUsername] = useState(false);
+  const [usernameExists, setUsernameExists] = useState(false);
+
+  // State để theo dõi việc kiểm tra email
+  const [isCheckingEmail, setIsCheckingEmail] = useState(false);
+  const [emailExists, setEmailExists] = useState(false);
+
+  // Sử dụng useRef để lưu trữ timeout ID cho debounce
+  const usernameCheckTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const emailCheckTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Check if the user being edited is the current logged-in admin
   const isCurrentAdmin: boolean = !!(
@@ -126,37 +152,206 @@ export const UserForm: React.FC<UserFormProps> = ({
         ...prev,
         [field]: value,
       }));
+
+      // Nếu đang thay đổi tên đăng nhập, kiểm tra xem tên đã tồn tại chưa
+      if (field === "username" && typeof value === "string") {
+        // Xóa lỗi tên đăng nhập nếu trường rỗng
+        if (!value.trim()) {
+          setUsernameExists(false);
+          setFieldErrors((prev) => ({ ...prev, username: false }));
+          return;
+        }
+
+        // Kiểm tra tên đăng nhập hợp lệ trước khi gọi API
+        if (!/^[a-zA-Z0-9_.-]+$/.test(value) || value.length < 3) {
+          return;
+        }
+
+        // Nếu đang chỉnh sửa người dùng và tên đăng nhập không thay đổi, không cần kiểm tra
+        if (initialData && initialData.username === value) {
+          setUsernameExists(false);
+          setFieldErrors((prev) => ({ ...prev, username: false }));
+          return;
+        }
+
+        // Hủy timeout trước đó nếu có
+        if (usernameCheckTimeoutRef.current) {
+          clearTimeout(usernameCheckTimeoutRef.current);
+        }
+
+        // Đặt timeout mới để debounce việc kiểm tra
+        usernameCheckTimeoutRef.current = setTimeout(async () => {
+          try {
+            setIsCheckingUsername(true);
+
+            // Gọi API để kiểm tra tên đăng nhập
+            const exists = await usersApi.checkUsernameExists(value);
+
+            // Cập nhật state
+            setUsernameExists(exists);
+
+            // Nếu tên đăng nhập đã tồn tại, đánh dấu trường là lỗi
+            if (exists) {
+              setFieldErrors((prev) => ({ ...prev, username: true }));
+            } else {
+              // Nếu tên đăng nhập chưa tồn tại, xóa lỗi
+              setFieldErrors((prev) => ({ ...prev, username: false }));
+            }
+          } catch (error) {
+            console.error("Error checking username:", error);
+          } finally {
+            setIsCheckingUsername(false);
+          }
+        }, 500); // Đợi 500ms sau khi người dùng ngừng gõ
+      }
+
+      // Nếu đang thay đổi email, kiểm tra xem email đã tồn tại chưa
+      if (field === "email" && typeof value === "string") {
+        // Xóa lỗi email nếu trường rỗng
+        if (!value.trim()) {
+          setEmailExists(false);
+          setFieldErrors((prev) => ({ ...prev, email: false }));
+          return;
+        }
+
+        // Kiểm tra email hợp lệ trước khi gọi API
+        if (!/\S+@\S+\.\S+/.test(value)) {
+          return;
+        }
+
+        // Nếu đang chỉnh sửa người dùng và email không thay đổi, không cần kiểm tra
+        if (initialData && initialData.email === value) {
+          setEmailExists(false);
+          setFieldErrors((prev) => ({ ...prev, email: false }));
+          return;
+        }
+
+        // Hủy timeout trước đó nếu có
+        if (emailCheckTimeoutRef.current) {
+          clearTimeout(emailCheckTimeoutRef.current);
+        }
+
+        // Đặt timeout mới để debounce việc kiểm tra
+        emailCheckTimeoutRef.current = setTimeout(async () => {
+          try {
+            setIsCheckingEmail(true);
+
+            // Gọi API để kiểm tra email
+            const exists = await usersApi.checkEmailExists(value);
+
+            // Cập nhật state
+            setEmailExists(exists);
+
+            // Nếu email đã tồn tại, đánh dấu trường là lỗi
+            if (exists) {
+              setFieldErrors((prev) => ({ ...prev, email: true }));
+            } else {
+              // Nếu email chưa tồn tại, xóa lỗi
+              setFieldErrors((prev) => ({ ...prev, email: false }));
+            }
+          } catch (error) {
+            console.error("Error checking email:", error);
+          } finally {
+            setIsCheckingEmail(false);
+          }
+        }, 500); // Đợi 500ms sau khi người dùng ngừng gõ
+      }
     }
   };
 
   const validateForm = () => {
-    if (!formData.username || formData.username.length < 3) {
-      toast.error("Tên đăng nhập phải có ít nhất 3 ký tự");
-      return false;
+    // Kiểm tra tất cả các trường bắt buộc có được điền hay không
+    const errors: string[] = [];
+    const newFieldErrors: {
+      username?: boolean;
+      password?: boolean;
+      email?: boolean;
+      role?: boolean;
+    } = {};
+
+    // Kiểm tra tên đăng nhập
+    if (!formData.username) {
+      errors.push("Tên đăng nhập không được để trống");
+      newFieldErrors.username = true;
+    } else if (formData.username.length < 3) {
+      errors.push("Tên đăng nhập phải có ít nhất 3 ký tự");
+      newFieldErrors.username = true;
+    } else if (!/^[a-zA-Z0-9_.-]+$/.test(formData.username)) {
+      errors.push(
+        "Tên đăng nhập chỉ được chứa chữ cái không dấu, số và các ký tự _ . -"
+      );
+      newFieldErrors.username = true;
+    } else if (usernameExists) {
+      // Kiểm tra nếu tên đăng nhập đã tồn tại (từ kiểm tra real-time)
+      errors.push(
+        "Tên đăng nhập đã tồn tại. Vui lòng chọn tên đăng nhập khác."
+      );
+      newFieldErrors.username = true;
     }
 
-    if (!initialData && (!formData.password || formData.password.length < 6)) {
-      toast.error("Mật khẩu phải có ít nhất 6 ký tự");
-      return false;
+    // Kiểm tra mật khẩu (chỉ khi tạo mới người dùng)
+    if (!initialData) {
+      if (!formData.password) {
+        errors.push("Mật khẩu không được để trống");
+        newFieldErrors.password = true;
+      } else if (formData.password.length < 6) {
+        errors.push("Mật khẩu phải có ít nhất 6 ký tự");
+        newFieldErrors.password = true;
+      }
     }
 
-    if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) {
-      toast.error("Email không hợp lệ");
-      return false;
+    // Kiểm tra email
+    if (!formData.email) {
+      errors.push("Email không được để trống");
+      newFieldErrors.email = true;
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      errors.push("Email không đúng định dạng");
+      newFieldErrors.email = true;
+    } else if (emailExists) {
+      // Kiểm tra nếu email đã tồn tại (từ kiểm tra real-time)
+      errors.push("Email đã tồn tại. Vui lòng sử dụng email khác.");
+      newFieldErrors.email = true;
     }
 
+    // Kiểm tra vai trò
     if (!formData.role) {
-      toast.error("Vui lòng chọn vai trò");
+      errors.push("Vui lòng chọn vai trò");
+      newFieldErrors.role = true;
+    }
+
+    // Cập nhật trạng thái lỗi của các trường
+    setFieldErrors(newFieldErrors);
+
+    // Nếu có lỗi, hiển thị thông báo và cập nhật trạng thái form
+    if (errors.length > 0) {
+      // Hiển thị toast cho lỗi đầu tiên
+      toast.error(errors[0]);
+
+      // Cập nhật trạng thái lỗi của form
+      setFormState("error");
+      setFormError(errors.join(", "));
+
       return false;
     }
 
+    // Nếu không có lỗi, reset trạng thái lỗi
+    setFormError(null);
+    setFieldErrors({});
     return true;
   };
 
   const handleSubmit = async () => {
-    if (!validateForm()) return;
+    // Kiểm tra form trước khi submit
+    if (!validateForm()) {
+      // Nếu form không hợp lệ, dừng lại
+      return;
+    }
 
+    // Nếu form hợp lệ, tiếp tục xử lý
     setIsSubmitting(true);
+    setFormState("submitting");
+    setFormError(null);
+
     try {
       if (initialData) {
         // Update existing user
@@ -187,12 +382,26 @@ export const UserForm: React.FC<UserFormProps> = ({
         console.log("Update response:", response);
 
         if (response.success) {
+          setFormState("success");
           toast.success("Cập nhật người dùng thành công");
-          onOpenChange(false);
-          onSubmitSuccess();
+
+          // Close dialog after a short delay
+          setTimeout(() => {
+            onOpenChange(false);
+            onSubmitSuccess();
+          }, 1000);
         } else {
           console.error("Update failed:", response);
-          toast.error(response.message || "Không thể cập nhật người dùng");
+          setFormState("error");
+
+          // Lấy thông báo lỗi từ response và xử lý lỗi tên đăng nhập/email đã tồn tại
+          let errorMessage =
+            response.message || "Không thể cập nhật người dùng";
+          errorMessage = handleUsernameExistsError(errorMessage);
+          errorMessage = handleEmailExistsError(errorMessage);
+
+          setFormError(errorMessage);
+          toast.error(errorMessage);
         }
       } else {
         // Create new user
@@ -210,16 +419,30 @@ export const UserForm: React.FC<UserFormProps> = ({
         console.log("Create response:", response);
 
         if (response.success) {
+          setFormState("success");
           toast.success("Tạo người dùng thành công");
-          onOpenChange(false);
-          onSubmitSuccess();
+
+          // Close dialog after a short delay
+          setTimeout(() => {
+            onOpenChange(false);
+            onSubmitSuccess();
+          }, 1000);
         } else {
           console.error("Create failed:", response);
-          toast.error(response.message || "Không thể tạo người dùng mới");
+          setFormState("error");
+
+          // Lấy thông báo lỗi từ response và xử lý lỗi tên đăng nhập/email đã tồn tại
+          let errorMessage = response.message || "Không thể tạo người dùng mới";
+          errorMessage = handleUsernameExistsError(errorMessage);
+          errorMessage = handleEmailExistsError(errorMessage);
+
+          setFormError(errorMessage);
+          toast.error(errorMessage);
         }
       }
     } catch (error) {
       console.error("Error submitting user form:", error);
+      setFormState("error");
 
       // Extract error message from response if available
       let errorMessage = "Có lỗi xảy ra. Vui lòng thử lại sau.";
@@ -243,14 +466,80 @@ export const UserForm: React.FC<UserFormProps> = ({
         }
       }
 
+      // Xử lý lỗi tên đăng nhập và email đã tồn tại
+      errorMessage = handleUsernameExistsError(errorMessage);
+      errorMessage = handleEmailExistsError(errorMessage);
+
+      setFormError(errorMessage);
       toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  // Hàm tiện ích để xử lý lỗi tên đăng nhập đã tồn tại
+  const handleUsernameExistsError = (errorMessage: string): string => {
+    // Kiểm tra nếu lỗi liên quan đến tên đăng nhập đã tồn tại
+    const usernameExistsError =
+      errorMessage.toLowerCase().includes("username") &&
+      (errorMessage.toLowerCase().includes("already exists") ||
+        errorMessage.toLowerCase().includes("already taken") ||
+        errorMessage.toLowerCase().includes("đã tồn tại") ||
+        errorMessage.toLowerCase().includes("đã được sử dụng"));
+
+    if (usernameExistsError) {
+      // Đánh dấu trường tên đăng nhập là lỗi
+      setFieldErrors((prev) => ({
+        ...prev,
+        username: true,
+      }));
+
+      // Cập nhật thông báo lỗi để rõ ràng hơn
+      return "Tên đăng nhập đã tồn tại. Vui lòng chọn tên đăng nhập khác.";
+    }
+
+    return errorMessage;
+  };
+
+  // Hàm tiện ích để xử lý lỗi email đã tồn tại
+  const handleEmailExistsError = (errorMessage: string): string => {
+    // Kiểm tra nếu lỗi liên quan đến email đã tồn tại
+    const emailExistsError =
+      errorMessage.toLowerCase().includes("email") &&
+      (errorMessage.toLowerCase().includes("already exists") ||
+        errorMessage.toLowerCase().includes("already taken") ||
+        errorMessage.toLowerCase().includes("đã tồn tại") ||
+        errorMessage.toLowerCase().includes("đã được sử dụng"));
+
+    if (emailExistsError) {
+      // Đánh dấu trường email là lỗi
+      setFieldErrors((prev) => ({
+        ...prev,
+        email: true,
+      }));
+
+      // Cập nhật thông báo lỗi để rõ ràng hơn
+      return "Email đã tồn tại. Vui lòng sử dụng email khác.";
+    }
+
+    return errorMessage;
+  };
+
+  // Handle dialog close with state reset
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      // Reset state when closing
+      setTimeout(() => {
+        setFormState("idle");
+        setFormError(null);
+        setFieldErrors({}); // Reset field errors
+      }, 300);
+    }
+    onOpenChange(open);
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[550px] border-orange-100 shadow-lg">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold bg-gradient-to-r from-orange-500 to-amber-600 bg-clip-text text-transparent flex items-center">
@@ -273,6 +562,30 @@ export const UserForm: React.FC<UserFormProps> = ({
           </p>
         </DialogHeader>
 
+        {/* Error message display */}
+        {formError && formState === "error" && (
+          <Alert
+            variant="destructive"
+            className="mt-2 mb-4 bg-red-50 border-red-200"
+          >
+            <AlertCircle className="h-4 w-4 mr-2 flex-shrink-0" />
+            <AlertDescription>
+              {formError.includes(", ") ? (
+                <div className="space-y-1">
+                  <p className="font-medium">Vui lòng sửa các lỗi sau:</p>
+                  <ul className="list-disc pl-5 text-sm space-y-1">
+                    {formError.split(", ").map((error, index) => (
+                      <li key={index}>{error}</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : (
+                formError
+              )}
+            </AlertDescription>
+          </Alert>
+        )}
+
         <div className="grid gap-5 py-5">
           <div className="grid grid-cols-4 items-center gap-4">
             <Label
@@ -281,13 +594,59 @@ export const UserForm: React.FC<UserFormProps> = ({
             >
               Tên đăng nhập <span className="text-red-500">*</span>
             </Label>
-            <Input
-              id="username"
-              value={formData.username}
-              onChange={(e) => handleChange("username", e.target.value)}
-              className="col-span-3 border-orange-200 focus:border-orange-400 focus:ring-orange-400"
-              placeholder="Nhập tên đăng nhập"
-            />
+            <div className="col-span-3 space-y-1">
+              <Input
+                id="username"
+                value={formData.username}
+                onChange={(e) => handleChange("username", e.target.value)}
+                className={`w-full ${
+                  fieldErrors.username
+                    ? "border-red-300 focus:border-red-500 focus:ring-red-500"
+                    : "border-orange-200 focus:border-orange-400 focus:ring-orange-400"
+                }`}
+                placeholder="Nhập tên đăng nhập (không dấu, chỉ chứa a-z, 0-9, _, ., -)"
+                aria-invalid={fieldErrors.username}
+              />
+              {isCheckingUsername ? (
+                <p className="text-xs text-blue-500 font-medium flex items-center">
+                  <svg
+                    className="animate-spin -ml-1 mr-2 h-3 w-3 text-blue-500"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Đang kiểm tra tên đăng nhập...
+                </p>
+              ) : fieldErrors.username ? (
+                <p className="text-xs text-red-500 font-medium">
+                  {usernameExists
+                    ? "Tên đăng nhập đã tồn tại. Vui lòng chọn tên đăng nhập khác."
+                    : formError &&
+                      formError.includes("Tên đăng nhập đã tồn tại")
+                    ? "Tên đăng nhập đã tồn tại. Vui lòng chọn tên đăng nhập khác."
+                    : "Tên đăng nhập không hợp lệ. Vui lòng kiểm tra lại."}
+                </p>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  Tên đăng nhập phải có ít nhất 3 ký tự và chỉ chứa chữ cái
+                  không dấu, số và các ký tự _ . -
+                </p>
+              )}
+            </div>
           </div>
 
           {!initialData && (
@@ -303,8 +662,13 @@ export const UserForm: React.FC<UserFormProps> = ({
                 type="password"
                 value={formData.password}
                 onChange={(e) => handleChange("password", e.target.value)}
-                className="col-span-3 border-orange-200 focus:border-orange-400 focus:ring-orange-400"
+                className={`col-span-3 ${
+                  fieldErrors.password
+                    ? "border-red-300 focus:border-red-500 focus:ring-red-500"
+                    : "border-orange-200 focus:border-orange-400 focus:ring-orange-400"
+                }`}
                 placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)"
+                aria-invalid={fieldErrors.password}
               />
             </div>
           )}
@@ -340,14 +704,54 @@ export const UserForm: React.FC<UserFormProps> = ({
             >
               Email <span className="text-red-500">*</span>
             </Label>
-            <Input
-              id="email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => handleChange("email", e.target.value)}
-              className="col-span-3 border-orange-200 focus:border-orange-400 focus:ring-orange-400"
-              placeholder="Nhập địa chỉ email"
-            />
+            <div className="col-span-3 space-y-1">
+              <Input
+                id="email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => handleChange("email", e.target.value)}
+                className={`w-full ${
+                  fieldErrors.email
+                    ? "border-red-300 focus:border-red-500 focus:ring-red-500"
+                    : "border-orange-200 focus:border-orange-400 focus:ring-orange-400"
+                }`}
+                placeholder="Nhập địa chỉ email"
+                aria-invalid={fieldErrors.email}
+              />
+              {isCheckingEmail ? (
+                <p className="text-xs text-blue-500 font-medium flex items-center">
+                  <svg
+                    className="animate-spin -ml-1 mr-2 h-3 w-3 text-blue-500"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Đang kiểm tra email...
+                </p>
+              ) : fieldErrors.email ? (
+                <p className="text-xs text-red-500 font-medium">
+                  {emailExists
+                    ? "Email đã tồn tại. Vui lòng sử dụng email khác."
+                    : formError && formError.includes("Email đã tồn tại")
+                    ? "Email đã tồn tại. Vui lòng sử dụng email khác."
+                    : "Email không hợp lệ. Vui lòng kiểm tra lại."}
+                </p>
+              ) : null}
+            </div>
           </div>
 
           <div className="grid grid-cols-4 items-center gap-4">
@@ -362,7 +766,14 @@ export const UserForm: React.FC<UserFormProps> = ({
                 value={formData.role}
                 onValueChange={(value) => handleChange("role", value)}
               >
-                <SelectTrigger className="w-full border-orange-200 focus:border-orange-400 focus:ring-orange-400">
+                <SelectTrigger
+                  className={`w-full ${
+                    fieldErrors.role
+                      ? "border-red-300 focus:border-red-500 focus:ring-red-500"
+                      : "border-orange-200 focus:border-orange-400 focus:ring-orange-400"
+                  }`}
+                  aria-invalid={fieldErrors.role}
+                >
                   <SelectValue placeholder="Chọn vai trò" />
                 </SelectTrigger>
                 <SelectContent>

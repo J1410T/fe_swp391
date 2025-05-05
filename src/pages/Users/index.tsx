@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { usersApi } from "@/api/resources/users";
 import { User } from "@/api/resources/auth";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Table,
   TableBody,
@@ -25,6 +26,7 @@ import {
   Shield,
   CheckCircle,
   XCircle,
+  AlertCircle,
 } from "lucide-react";
 
 /**
@@ -36,6 +38,7 @@ export function Users(): React.ReactElement {
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Dialog states
   const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
@@ -49,12 +52,17 @@ export function Users(): React.ReactElement {
 
   const fetchUsers = async () => {
     setIsLoading(true);
+    setError(null);
+
     try {
       const response = await usersApi.getAll();
       if (response.success) {
         setUsers(response.data);
       } else {
-        toast.error("Không thể tải danh sách người dùng");
+        const errorMessage =
+          response.message || "Không thể tải danh sách người dùng";
+        setError(errorMessage);
+        toast.error(errorMessage);
       }
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -62,7 +70,9 @@ export function Users(): React.ReactElement {
       // Extract error message from response if available
       let errorMessage = "Có lỗi xảy ra khi tải danh sách người dùng";
 
-      if (error && typeof error === "object") {
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (error && typeof error === "object") {
         // Use a more specific type for the error
         interface ErrorWithResponse {
           response?: {
@@ -81,6 +91,7 @@ export function Users(): React.ReactElement {
         }
       }
 
+      setError(errorMessage);
       toast.error(errorMessage);
     } finally {
       setIsLoading(false);
@@ -178,6 +189,17 @@ export function Users(): React.ReactElement {
             Làm mới danh sách
           </Button>
         </div>
+
+        {/* Error message display */}
+        {error && (
+          <Alert
+            variant="destructive"
+            className="mt-4 bg-red-50 border-red-200"
+          >
+            <AlertCircle className="h-4 w-4 mr-2" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
       </div>
 
       {/* Table Section with improved styling */}
