@@ -17,7 +17,7 @@ export const scholarshipsApi = {
   getAll: async (): Promise<ApiResponse<ScholarshipResponse[]>> => {
     return api.get<ApiResponse<ScholarshipResponse[]>>('/scholarships');
   },
-  
+
   /**
    * Lấy học bổng theo ID
    * @param id ID của học bổng
@@ -26,7 +26,7 @@ export const scholarshipsApi = {
   getById: async (id: number): Promise<ApiResponse<ScholarshipResponse>> => {
     return api.get<ApiResponse<ScholarshipResponse>>(`/scholarships/${id}`);
   },
-  
+
   /**
    * Tạo học bổng mới
    * @param data Dữ liệu học bổng
@@ -38,13 +38,12 @@ export const scholarshipsApi = {
     amount: number;
     description: string;
     application_url: string;
-    major_id?: number | null;
+    major_id: number | null;
     campus_id?: number | null;
-    academic_year_id: number;
   }): Promise<ApiResponse<ScholarshipResponse>> => {
     return api.post<ApiResponse<ScholarshipResponse>>('/scholarships', data);
   },
-  
+
   /**
    * Cập nhật học bổng
    * @param id ID của học bổng
@@ -54,7 +53,7 @@ export const scholarshipsApi = {
   update: async (id: number, data: Partial<Omit<ScholarshipResponse, 'id' | 'major' | 'campus'>>): Promise<ApiResponse<ScholarshipResponse>> => {
     return api.put<ApiResponse<ScholarshipResponse>>(`/scholarships/${id}`, data);
   },
-  
+
   /**
    * Xóa học bổng
    * @param id ID của học bổng
