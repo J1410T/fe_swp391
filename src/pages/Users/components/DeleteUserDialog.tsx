@@ -9,16 +9,24 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 import { usersApi } from "@/api/resources/users";
 import { User } from "@/api/resources/auth";
-import { Trash2, RefreshCw } from "lucide-react";
+import {
+  Trash2,
+  RefreshCw,
+  AlertTriangle,
+  CheckCircle,
+  AlertCircle,
+  X,
+} from "lucide-react";
 
 interface DeleteUserDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   user: User | null;
-  onDeleteSuccess: () => void;
+  onDeleteSuccess: (deletedUser: User) => void;
 }
 
 export const DeleteUserDialog: React.FC<DeleteUserDialogProps> = ({
@@ -28,11 +36,30 @@ export const DeleteUserDialog: React.FC<DeleteUserDialogProps> = ({
   onDeleteSuccess,
 }) => {
   const [isDeleting, setIsDeleting] = useState(false);
+  const [dialogState, setDialogState] = useState<
+    "confirm" | "success" | "error"
+  >("confirm");
+  const [errorMessage, setErrorMessage] = useState<string>("");
+
+  // Handle dialog close with state reset
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      // Reset state when closing
+      setTimeout(() => {
+        setDialogState("confirm");
+        setErrorMessage("");
+      }, 300);
+    }
+    onOpenChange(open);
+  };
 
   const handleDelete = async () => {
     if (!user) return;
 
     setIsDeleting(true);
+    setDialogState("confirm");
+    setErrorMessage("");
+
     try {
       console.log(
         `Attempting to delete user with ID: ${user.id} using hard delete`
@@ -43,11 +70,30 @@ export const DeleteUserDialog: React.FC<DeleteUserDialogProps> = ({
       console.log(`Hard delete response for user ${user.id}:`, response);
 
       if (response && response.success) {
-        toast.success("Người dùng đã được xóa thành công");
-        onDeleteSuccess();
-        onOpenChange(false);
+        // Show success state
+        setDialogState("success");
+
+        // Hiển thị thông báo thành công
+        toast.success("Người dùng đã được xóa thành công", {
+          position: "top-center",
+          duration: 3000,
+          icon: <Trash2 className="h-5 w-5 text-green-500" />,
+        });
+
+        // Close dialog after a short delay
+        setTimeout(() => {
+          // Đảm bảo user không null trước khi gọi callback
+          if (user) {
+            onDeleteSuccess(user);
+          }
+          handleOpenChange(false);
+        }, 2000);
       } else {
         console.error("Delete response not successful:", response);
+        setDialogState("error");
+        setErrorMessage(
+          response?.message || "Không thể xóa người dùng. Vui lòng thử lại sau."
+        );
         toast.error(
           response?.message || "Không thể xóa người dùng. Vui lòng thử lại sau."
         );
@@ -78,6 +124,8 @@ export const DeleteUserDialog: React.FC<DeleteUserDialogProps> = ({
         }
       }
 
+      setDialogState("error");
+      setErrorMessage(errorMessage);
       toast.error(errorMessage);
     } finally {
       setIsDeleting(false);
@@ -87,73 +135,119 @@ export const DeleteUserDialog: React.FC<DeleteUserDialogProps> = ({
   if (!user) return null;
 
   return (
-    <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
+    <AlertDialog open={isOpen} onOpenChange={handleOpenChange}>
       <AlertDialogContent className="border-red-100 shadow-lg">
-        <AlertDialogHeader>
-          <AlertDialogTitle className="text-xl font-bold text-red-600 flex items-center">
-            <Trash2 className="h-5 w-5 mr-2" />
-            Xác nhận xóa người dùng
-          </AlertDialogTitle>
-          <AlertDialogDescription className="mt-3 text-base">
-            Bạn có chắc chắn muốn xóa người dùng{" "}
-            <span className="font-semibold text-foreground">
-              {user.username}
-            </span>
-            ?
-            <div className="mt-4 p-3 bg-red-50 border border-red-100 rounded-md text-red-800">
-              <div className="flex items-start">
-                <div className="mr-3 mt-0.5">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    className="w-5 h-5"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
+        {/* Confirmation State */}
+        {dialogState === "confirm" && (
+          <>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-xl font-bold text-red-600 flex items-center">
+                <Trash2 className="h-5 w-5 mr-2" />
+                Xác nhận xóa người dùng
+              </AlertDialogTitle>
+              <AlertDialogDescription className="mt-3 text-base">
+                Bạn có chắc chắn muốn xóa người dùng{" "}
+                <span className="font-semibold text-foreground">
+                  {user.username}
+                </span>
+                ?
+                <div className="mt-4 p-3 bg-red-50 border border-red-100 rounded-md text-red-800">
+                  <div className="flex items-start">
+                    <AlertTriangle className="h-5 w-5 mr-3 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="font-medium">
+                        Cảnh báo: Hành động này không thể hoàn tác
+                      </p>
+                      <p className="mt-1 text-sm">
+                        Tất cả dữ liệu liên quan đến người dùng này sẽ bị xóa
+                        vĩnh viễn khỏi hệ thống.
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-medium">
-                    Cảnh báo: Hành động này không thể hoàn tác
-                  </p>
-                  <p className="mt-1 text-sm">
-                    Tất cả dữ liệu liên quan đến người dùng này sẽ bị xóa vĩnh
-                    viễn khỏi hệ thống.
-                  </p>
-                </div>
-              </div>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="mt-4 gap-2">
+              <AlertDialogCancel
+                disabled={isDeleting}
+                className="border-gray-300 hover:bg-gray-100 transition-colors"
+              >
+                Hủy bỏ
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="bg-red-500 hover:bg-red-600 text-white font-medium shadow-sm hover:shadow transition-all"
+              >
+                {isDeleting ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                    Đang xóa...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Xóa người dùng
+                  </>
+                )}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </>
+        )}
+
+        {/* Success State */}
+        {dialogState === "success" && (
+          <div className="py-6 px-4 text-center">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 mb-4">
+              <CheckCircle className="h-8 w-8 text-green-600" />
             </div>
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter className="mt-4 gap-2">
-          <AlertDialogCancel
-            disabled={isDeleting}
-            className="border-gray-300 hover:bg-gray-100 transition-colors"
-          >
-            Hủy bỏ
-          </AlertDialogCancel>
-          <AlertDialogAction
-            onClick={handleDelete}
-            disabled={isDeleting}
-            className="bg-red-500 hover:bg-red-600 text-white font-medium shadow-sm hover:shadow transition-all"
-          >
-            {isDeleting ? (
-              <>
-                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                Đang xóa...
-              </>
-            ) : (
-              <>
-                <Trash2 className="h-4 w-4 mr-2" />
-                Xóa người dùng
-              </>
-            )}
-          </AlertDialogAction>
-        </AlertDialogFooter>
+            <h3 className="text-xl font-medium text-gray-900 mb-2">
+              Xóa thành công
+            </h3>
+            <p className="text-base text-gray-600 mb-5">
+              Người dùng <span className="font-semibold">{user.username}</span>{" "}
+              đã được xóa thành công khỏi hệ thống.
+            </p>
+            <div className="animate-pulse text-sm text-gray-500">
+              Cửa sổ này sẽ tự động đóng sau vài giây...
+            </div>
+          </div>
+        )}
+
+        {/* Error State */}
+        {dialogState === "error" && (
+          <div className="py-4 px-4">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100 mb-4">
+              <AlertCircle className="h-6 w-6 text-red-600" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2 text-center">
+              Lỗi khi xóa người dùng
+            </h3>
+
+            <Alert
+              variant="destructive"
+              className="mb-4 bg-red-50 border-red-200"
+            >
+              <AlertCircle className="h-4 w-4 mr-2" />
+              <AlertDescription>{errorMessage}</AlertDescription>
+            </Alert>
+
+            <div className="flex justify-end gap-2 mt-4">
+              <AlertDialogCancel
+                className="border-gray-300 hover:bg-gray-100 transition-colors"
+                onClick={() => setDialogState("confirm")}
+              >
+                Thử lại
+              </AlertDialogCancel>
+              <AlertDialogCancel
+                className="bg-red-100 text-red-700 hover:bg-red-200 border-red-200 transition-colors"
+                onClick={() => handleOpenChange(false)}
+              >
+                Đóng
+              </AlertDialogCancel>
+            </div>
+          </div>
+        )}
       </AlertDialogContent>
     </AlertDialog>
   );

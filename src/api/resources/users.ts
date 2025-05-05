@@ -53,6 +53,48 @@ export interface UserListResponse {
  */
 export const usersApi = {
   /**
+   * Kiểm tra tên đăng nhập đã tồn tại hay chưa
+   * @param username Tên đăng nhập cần kiểm tra
+   * @returns Promise với kết quả kiểm tra (true nếu đã tồn tại, false nếu chưa)
+   */
+  checkUsernameExists: async (username: string): Promise<boolean> => {
+    try {
+      // Sử dụng API getAll với tham số lọc theo username
+      const response = await api.get<UserListResponse>('/auth/users', {
+        params: { username }
+      });
+
+      // Nếu có kết quả trả về và có ít nhất một người dùng, tên đăng nhập đã tồn tại
+      return response.success && response.data && response.data.length > 0;
+    } catch (error) {
+      console.error('Error checking username existence:', error);
+      // Trong trường hợp có lỗi, trả về false để không chặn người dùng
+      return false;
+    }
+  },
+
+  /**
+   * Kiểm tra email đã tồn tại hay chưa
+   * @param email Email cần kiểm tra
+   * @returns Promise với kết quả kiểm tra (true nếu đã tồn tại, false nếu chưa)
+   */
+  checkEmailExists: async (email: string): Promise<boolean> => {
+    try {
+      // Sử dụng API getAll với tham số lọc theo email
+      const response = await api.get<UserListResponse>('/auth/users', {
+        params: { email }
+      });
+
+      // Nếu có kết quả trả về và có ít nhất một người dùng, email đã tồn tại
+      return response.success && response.data && response.data.length > 0;
+    } catch (error) {
+      console.error('Error checking email existence:', error);
+      // Trong trường hợp có lỗi, trả về false để không chặn người dùng
+      return false;
+    }
+  },
+
+  /**
    * Lấy danh sách người dùng
    * @param params Tham số lọc (username, email, role, is_active)
    * @returns Promise với danh sách người dùng
@@ -63,7 +105,28 @@ export const usersApi = {
     role?: 'admin' | 'staff';
     is_active?: boolean;
   }): Promise<UserListResponse> => {
-    return api.get<UserListResponse>('/auth/users', { params });
+    try {
+      return await api.get<UserListResponse>('/auth/users', { params });
+    } catch (error) {
+      console.error('Error fetching users list:', error);
+
+      // Format error for better display
+      if (error instanceof Error) {
+        // If it's already an Error object, rethrow it
+        throw error;
+      } else if (typeof error === 'object' && error !== null) {
+        // Try to extract message from error object
+        const errorObj = error as any;
+        if (errorObj.response?.data?.message) {
+          throw new Error(errorObj.response.data.message);
+        } else if (errorObj.message) {
+          throw new Error(errorObj.message);
+        }
+      }
+
+      // Default error message
+      throw new Error('Không thể tải danh sách người dùng. Vui lòng thử lại sau.');
+    }
   },
 
   /**
@@ -72,7 +135,28 @@ export const usersApi = {
    * @returns Promise với thông tin người dùng
    */
   getById: async (id: number): Promise<UserResponse> => {
-    return api.get<UserResponse>(`/auth/users/${id}`);
+    try {
+      return await api.get<UserResponse>(`/auth/users/${id}`);
+    } catch (error) {
+      console.error(`Error fetching user with ID ${id}:`, error);
+
+      // Format error for better display
+      if (error instanceof Error) {
+        // If it's already an Error object, rethrow it
+        throw error;
+      } else if (typeof error === 'object' && error !== null) {
+        // Try to extract message from error object
+        const errorObj = error as any;
+        if (errorObj.response?.data?.message) {
+          throw new Error(errorObj.response.data.message);
+        } else if (errorObj.message) {
+          throw new Error(errorObj.message);
+        }
+      }
+
+      // Default error message
+      throw new Error(`Không thể tải thông tin người dùng với ID: ${id}. Vui lòng thử lại sau.`);
+    }
   },
 
   /**
@@ -101,7 +185,23 @@ export const usersApi = {
       return response;
     } catch (error) {
       console.error('Error creating user:', error);
-      throw error;
+
+      // Format error for better display
+      if (error instanceof Error) {
+        // If it's already an Error object, rethrow it
+        throw error;
+      } else if (typeof error === 'object' && error !== null) {
+        // Try to extract message from error object
+        const errorObj = error as any;
+        if (errorObj.response?.data?.message) {
+          throw new Error(errorObj.response.data.message);
+        } else if (errorObj.message) {
+          throw new Error(errorObj.message);
+        }
+      }
+
+      // Default error message
+      throw new Error(`Không thể tạo người dùng. Vui lòng thử lại sau.`);
     }
   },
 
@@ -131,7 +231,23 @@ export const usersApi = {
       return response;
     } catch (error) {
       console.error(`Error updating user ${id}:`, error);
-      throw error;
+
+      // Format error for better display
+      if (error instanceof Error) {
+        // If it's already an Error object, rethrow it
+        throw error;
+      } else if (typeof error === 'object' && error !== null) {
+        // Try to extract message from error object
+        const errorObj = error as any;
+        if (errorObj.response?.data?.message) {
+          throw new Error(errorObj.response.data.message);
+        } else if (errorObj.message) {
+          throw new Error(errorObj.message);
+        }
+      }
+
+      // Default error message
+      throw new Error(`Không thể cập nhật người dùng với ID: ${id}. Vui lòng thử lại sau.`);
     }
   },
 
@@ -156,7 +272,23 @@ export const usersApi = {
       return response;
     } catch (error) {
       console.error(`Error deleting user ${id}:`, error);
-      throw error;
+
+      // Format error for better display
+      if (error instanceof Error) {
+        // If it's already an Error object, rethrow it
+        throw error;
+      } else if (typeof error === 'object' && error !== null) {
+        // Try to extract message from error object
+        const errorObj = error as any;
+        if (errorObj.response?.data?.message) {
+          throw new Error(errorObj.response.data.message);
+        } else if (errorObj.message) {
+          throw new Error(errorObj.message);
+        }
+      }
+
+      // Default error message
+      throw new Error(`Không thể xóa người dùng với ID: ${id}. Vui lòng thử lại sau.`);
     }
   }
 };
