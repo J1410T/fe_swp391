@@ -25,7 +25,7 @@ import { toast } from "sonner";
 import { AddMajorModal } from "../../../pages/AdmissionMethods/components/AddMajorModal";
 
 interface MajorsTabProps {
-  academicYear: string;
+  academicYear: string | number;
   onRefetch: () => Promise<void>;
 }
 
@@ -138,13 +138,13 @@ export function MajorsTab({
   const [searchTerm, setSearchTerm] = useState("");
 
   // Lọc ngành học theo từ khóa tìm kiếm
-  const filteredMajors = staticMajors.filter(major => 
+  const filteredMajors = staticMajors.filter(major =>
     major.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     major.code.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
-    <motion.div 
+    <motion.div
       className="space-y-6"
       initial="hidden"
       animate="visible"
@@ -202,7 +202,7 @@ export function MajorsTab({
             </div>
             <div>
               <p className="text-xs font-medium text-green-800">Chỉ tiêu</p>
-              <p className="text-xl font-bold">{staticMajors.reduce((sum, major) => 
+              <p className="text-xl font-bold">{staticMajors.reduce((sum, major) =>
                 sum + major.campusData.reduce((campusSum, campus) => campusSum + campus.quota, 0), 0)}</p>
             </div>
           </CardContent>
@@ -241,9 +241,9 @@ export function MajorsTab({
           </TableHeader>
           <TableBody>
             {filteredMajors.length > 0 ? (
-              filteredMajors.flatMap(major => 
+              filteredMajors.flatMap(major =>
                 major.campusData.map((campus, index) => (
-                  <motion.tr 
+                  <motion.tr
                     key={`${major.id}-${campus.campus}`}
                     initial={{ opacity: 0, backgroundColor: "rgba(249, 250, 251, 0.5)" }}
                     animate={{ opacity: 1, backgroundColor: index % 2 === 0 ? "rgba(249, 250, 251, 0)" : "rgba(249, 250, 251, 0.5)" }}
@@ -301,8 +301,8 @@ export function MajorsTab({
                     <Search className="h-10 w-10 text-gray-300" />
                     <p>Không tìm thấy ngành học nào</p>
                     {searchTerm && (
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
                         onClick={() => setSearchTerm("")}
                       >

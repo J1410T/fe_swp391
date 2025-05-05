@@ -54,7 +54,7 @@ interface Scholarship {
 }
 
 interface ScholarshipsTabProps {
-  academicYear: string;
+  academicYear: string | number;
   onRefetch: () => Promise<void>;
 }
 
@@ -196,9 +196,9 @@ export function ScholarshipsTab({
   };
 
   // Lọc học bổng theo năm học
-  const year = parseInt(academicYear);
-  const filteredScholarships = scholarships.filter(scholarship => 
-    scholarship.availabilities.some(availability => 
+  const year = typeof academicYear === 'string' ? parseInt(academicYear, 10) : academicYear;
+  const filteredScholarships = scholarships.filter(scholarship =>
+    scholarship.availabilities.some(availability =>
       availability.academicYear.year === year
     )
   );
@@ -223,13 +223,13 @@ export function ScholarshipsTab({
   const [searchTerm, setSearchTerm] = useState("");
 
   // Lọc học bổng theo từ khóa tìm kiếm
-  const filteredResults = filteredScholarships.filter(scholarship => 
+  const filteredResults = filteredScholarships.filter(scholarship =>
     scholarship.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     scholarship.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
-    <motion.div 
+    <motion.div
       className="space-y-6"
       initial="hidden"
       animate="visible"
@@ -288,7 +288,7 @@ export function ScholarshipsTab({
             <div>
               <p className="text-xs font-medium text-green-800">Giá trị cao nhất</p>
               <p className="text-xl font-bold">
-                {filteredScholarships.length > 0 ? 
+                {filteredScholarships.length > 0 ?
                   new Intl.NumberFormat('vi-VN', {
                     style: 'currency',
                     currency: 'VND',
@@ -330,11 +330,11 @@ export function ScholarshipsTab({
           </TableHeader>
           <TableBody>
             {filteredResults.length > 0 ? (
-              filteredResults.flatMap(scholarship => 
+              filteredResults.flatMap(scholarship =>
                 scholarship.availabilities
                   .filter(availability => availability.academicYear.year === year)
                   .map((availability, index) => (
-                    <motion.tr 
+                    <motion.tr
                       key={`${scholarship.id}-${availability.id}`}
                       initial={{ opacity: 0, backgroundColor: "rgba(249, 250, 251, 0.5)" }}
                       animate={{ opacity: 1, backgroundColor: index % 2 === 0 ? "rgba(249, 250, 251, 0)" : "rgba(249, 250, 251, 0.5)" }}
@@ -387,7 +387,7 @@ export function ScholarshipsTab({
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
-                          
+
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
@@ -407,7 +407,7 @@ export function ScholarshipsTab({
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
-                          
+
                           {scholarship.application_url && (
                             <TooltipProvider>
                               <Tooltip>
@@ -443,8 +443,8 @@ export function ScholarshipsTab({
                     <Search className="h-10 w-10 text-gray-300" />
                     <p>Không tìm thấy học bổng nào</p>
                     {searchTerm && (
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
                         onClick={() => setSearchTerm("")}
                       >

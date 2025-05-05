@@ -14,7 +14,6 @@ import { useAcademicYears } from "./hooks/useAcademicYears";
 import { AcademicYearCard } from "./components/AcademicYearCard";
 import { YearContentTabs } from "./components/YearContentTabs";
 import { AddAcademicYearModal } from "./components/AddAcademicYearModal";
-import { EditAcademicYearModal } from "./components/EditAcademicYearModal";
 import { DeleteAcademicYearModal } from "./components/DeleteAcademicYearModal";
 
 /**
@@ -28,14 +27,12 @@ function AdmissionMethodsContent(): React.ReactElement {
     expandedYear,
     fetchAcademicYears,
     addAcademicYear,
-    updateAcademicYear,
     deleteAcademicYear,
     toggleYearExpanded,
   } = useAcademicYears();
 
   // State cho các modal
   const [isAddYearModalOpen, setIsAddYearModalOpen] = useState(false);
-  const [isEditYearModalOpen, setIsEditYearModalOpen] = useState(false);
   const [isDeleteYearModalOpen, setIsDeleteYearModalOpen] = useState(false);
   const [selectedYear, setSelectedYear] = useState<string | null>(null);
 
@@ -49,22 +46,9 @@ function AdmissionMethodsContent(): React.ReactElement {
     return fetchAcademicYears();
   };
 
-  const handleEditYear = (year: string) => {
-    setSelectedYear(year);
-    setIsEditYearModalOpen(true);
-  };
-
   const handleDeleteYear = (year: string) => {
     setSelectedYear(year);
     setIsDeleteYearModalOpen(true);
-  };
-
-  const handleUpdateYear = async () => {
-    if (selectedYear) {
-      await updateAcademicYear(selectedYear);
-      return fetchAcademicYears();
-    }
-    return Promise.resolve();
   };
 
   const handleConfirmDeleteYear = async () => {
@@ -110,14 +94,14 @@ function AdmissionMethodsContent(): React.ReactElement {
   };
 
   return (
-    <motion.div 
+    <motion.div
       className="container mx-auto py-10 space-y-8"
       initial="hidden"
       animate="visible"
       variants={containerAnimation}
     >
       {/* Header */}
-      <motion.div 
+      <motion.div
         className="flex flex-col md:flex-row md:justify-between md:items-center gap-4"
         variants={fadeInUpAnimation}
       >
@@ -147,7 +131,7 @@ function AdmissionMethodsContent(): React.ReactElement {
       </motion.div>
 
       {/* Thống kê nhanh */}
-      <motion.div 
+      <motion.div
         className="grid grid-cols-1 md:grid-cols-3 gap-4"
         variants={itemAnimation}
       >
@@ -192,11 +176,11 @@ function AdmissionMethodsContent(): React.ReactElement {
           <Calendar className="h-5 w-5 text-orange-500" />
           Danh sách năm tuyển sinh
         </h2>
-        
+
         <div className="space-y-4">
           {academicYears.length > 0 ? (
             academicYears.map((year, index) => (
-              <motion.div 
+              <motion.div
                 key={year.year}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -206,7 +190,6 @@ function AdmissionMethodsContent(): React.ReactElement {
                   year={year.year}
                   expanded={expandedYear === year.year}
                   onToggle={() => toggleYearExpanded(year.year)}
-                  onEdit={() => handleEditYear(year.year)}
                   onDelete={() => handleDeleteYear(year.year)}
                 >
                   <YearContentTabs
@@ -217,7 +200,7 @@ function AdmissionMethodsContent(): React.ReactElement {
               </motion.div>
             ))
           ) : (
-            <motion.div 
+            <motion.div
               className="text-center py-16 bg-gradient-to-br from-orange-50 to-amber-50 rounded-lg border border-orange-100 shadow-sm"
               variants={fadeInUpAnimation}
             >
@@ -249,22 +232,12 @@ function AdmissionMethodsContent(): React.ReactElement {
       />
 
       {selectedYear && (
-        <>
-          <EditAcademicYearModal
-            isOpen={isEditYearModalOpen}
-            onClose={() => setIsEditYearModalOpen(false)}
-            onSuccess={handleUpdateYear}
-            year={selectedYear}
-            description={academicYears.find((y) => y.year === selectedYear)?.description}
-          />
-
-          <DeleteAcademicYearModal
-            isOpen={isDeleteYearModalOpen}
-            onClose={() => setIsDeleteYearModalOpen(false)}
-            onSuccess={handleConfirmDeleteYear}
-            year={selectedYear}
-          />
-        </>
+        <DeleteAcademicYearModal
+          isOpen={isDeleteYearModalOpen}
+          onClose={() => setIsDeleteYearModalOpen(false)}
+          onSuccess={handleConfirmDeleteYear}
+          year={selectedYear}
+        />
       )}
     </motion.div>
   );

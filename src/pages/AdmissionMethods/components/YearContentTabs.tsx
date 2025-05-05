@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { School, Award } from "lucide-react";
 
 interface YearContentTabsProps {
-  academicYear: string;
+  academicYear: string | number;
   onRefetch: () => Promise<void>;
 }
 
@@ -22,15 +22,15 @@ export function YearContentTabs({
   return (
     <Tabs defaultValue="majors" className="w-full">
       <TabsList className="grid w-full grid-cols-2 mb-6 bg-gradient-to-r from-orange-100/50 to-amber-100/50 p-1 rounded-xl">
-        <TabsTrigger 
-          value="majors" 
+        <TabsTrigger
+          value="majors"
           className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-amber-500 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300 rounded-lg flex items-center gap-2"
         >
           <School className="h-4 w-4" />
           Ngành tuyển sinh
         </TabsTrigger>
-        <TabsTrigger 
-          value="scholarships" 
+        <TabsTrigger
+          value="scholarships"
           className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-amber-500 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300 rounded-lg flex items-center gap-2"
         >
           <Award className="h-4 w-4" />

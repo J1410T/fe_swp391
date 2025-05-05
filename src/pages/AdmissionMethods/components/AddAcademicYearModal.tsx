@@ -16,8 +16,8 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "../../../components/ui/textarea";
 import { toast } from "sonner";
+import { academicYearsApi } from "@/api/resources/academic-years";
 
 interface AddAcademicYearModalProps {
   isOpen: boolean;
@@ -34,7 +34,6 @@ export function AddAcademicYearModal({
 }: AddAcademicYearModalProps) {
   const currentYear = new Date().getFullYear();
   const [year, setYear] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
   const [loading, setLoading] = useState(false);
 
   // Tạo danh sách năm từ năm hiện tại đến năm hiện tại + 5
@@ -49,22 +48,30 @@ export function AddAcademicYearModal({
       return;
     }
 
+    // Kiểm tra xem năm đã tồn tại trong danh sách chưa
+    if (existingYears.includes(year)) {
+      toast.error(`Năm tuyển sinh ${year} đã tồn tại`);
+      return;
+    }
+
     try {
       setLoading(true);
-      // Mô phỏng API gọi để thêm năm tuyển sinh mới
-      // Trong thực tế, bạn sẽ gọi API thực tế ở đây
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      
+
+      // Gọi API để thêm năm tuyển sinh mới
+      await academicYearsApi.create({
+        year,
+      });
+
       toast.success(`Đã thêm năm tuyển sinh ${year}`);
       await onSuccess(year);
       onClose();
-      
+
       // Reset form
       setYear("");
-      setDescription("");
     } catch (error) {
-      console.error(error);
-      toast.error("Không thể thêm năm tuyển sinh");
+      // Xử lý lỗi
+      const errorMessage = error instanceof Error ? error.message : "Không thể thêm năm tuyển sinh";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -103,16 +110,7 @@ export function AddAcademicYearModal({
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="description">Mô tả (không bắt buộc)</Label>
-            <Textarea
-              id="description"
-              placeholder="Nhập mô tả cho năm tuyển sinh này"
-              value={description}
-              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value)}
-              rows={4}
-            />
-          </div>
+
         </div>
 
         <DialogFooter>

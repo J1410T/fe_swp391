@@ -30,7 +30,7 @@ interface Major {
 interface AddMajorModalProps {
   isOpen: boolean;
   onClose: () => void;
-  academicYear: string;
+  academicYear: string | number;
   onSuccess: () => Promise<void>;
 }
 
@@ -50,7 +50,7 @@ export function AddMajorModal({
     { id: 6, code: "7480201", name: "Công nghệ thông tin" },
     { id: 7, code: "7480108", name: "Trí tuệ nhân tạo" },
   ]);
-  
+
   const [selectedMajors, setSelectedMajors] = useState<number[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
@@ -88,7 +88,7 @@ export function AddMajorModal({
       // Mô phỏng API gọi để thêm ngành vào năm tuyển sinh
       // Trong thực tế, bạn sẽ gọi API thực tế ở đây
       await new Promise((resolve) => setTimeout(resolve, 800));
-      
+
       toast.success(`Đã thêm ${selectedMajors.length} ngành vào năm tuyển sinh ${academicYear}`);
       await onSuccess();
       onClose();
