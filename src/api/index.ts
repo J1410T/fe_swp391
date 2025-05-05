@@ -11,4 +11,5 @@ export * from './resources/admission-methods';
 export * from './resources/campuses';
 export * from './resources/scholarships';
 export * from './resources/dormitories';
+export * from './resources/academic-years';
 export * from './resources/users';

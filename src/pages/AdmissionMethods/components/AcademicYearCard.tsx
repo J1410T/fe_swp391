@@ -1,6 +1,6 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, Edit, Trash2, Calendar, GraduationCap } from "lucide-react";
+import { ChevronDown, Trash2, Calendar, GraduationCap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -14,10 +14,9 @@ import {
 } from "@/components/ui/card";
 
 interface AcademicYearCardProps {
-  year: string;
+  year: string | number;
   expanded: boolean;
   onToggle: () => void;
-  onEdit: () => void;
   onDelete: () => void;
   children?: React.ReactNode;
 }
@@ -26,15 +25,14 @@ export function AcademicYearCard({
   year,
   expanded,
   onToggle,
-  onEdit,
   onDelete,
   children,
 }: AcademicYearCardProps) {
   // Hiệu ứng khi hover
   const cardHoverAnimation = {
     rest: { scale: 1, },
-    hover: { 
-      scale: 1.005, 
+    hover: {
+      scale: 1.005,
       transition: { duration: 0.3, ease: "easeInOut" }
     }
   };
@@ -54,8 +52,8 @@ export function AcademicYearCard({
     >
       <Card className={cn(
         "w-full overflow-hidden border",
-        expanded 
-          ? "border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50" 
+        expanded
+          ? "border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50"
           : "border-gray-200 hover:border-orange-200 bg-white hover:bg-gradient-to-r hover:from-orange-50/50 hover:to-amber-50/50"
       )}>
         <CardHeader
@@ -94,19 +92,7 @@ export function AcademicYearCard({
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <motion.div variants={buttonAnimation}>
-              <Button
-                variant="outline"
-                size="icon"
-                className="border-orange-200 text-orange-500 hover:text-orange-600 hover:bg-orange-50 hover:border-orange-300"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onEdit();
-                }}
-              >
-                <Edit className="h-4 w-4" />
-              </Button>
-            </motion.div>
+
             <motion.div variants={buttonAnimation}>
               <Button
                 variant="outline"
@@ -120,7 +106,7 @@ export function AcademicYearCard({
                 <Trash2 className="h-4 w-4" />
               </Button>
             </motion.div>
-            <motion.div 
+            <motion.div
               className="p-1 rounded-full bg-orange-100"
               animate={{ rotate: expanded ? 180 : 0 }}
               transition={{ duration: 0.3 }}

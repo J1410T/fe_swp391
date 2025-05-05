@@ -10,11 +10,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
+
 interface DeleteAcademicYearModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => Promise<void>;
-  year: string;
+  year: string | number;
 }
 
 export function DeleteAcademicYearModal({
@@ -28,14 +29,12 @@ export function DeleteAcademicYearModal({
   const handleDelete = async () => {
     try {
       setLoading(true);
-      // Mô phỏng API gọi để xóa năm tuyển sinh
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      
-      toast.success(`Đã xóa năm tuyển sinh ${year}`);
+
+      // Gọi hàm onSuccess để xử lý xóa năm học
       await onSuccess();
       onClose();
     } catch (error) {
-      console.error(error);
+      // Xử lý lỗi
       toast.error("Không thể xóa năm tuyển sinh");
     } finally {
       setLoading(false);
