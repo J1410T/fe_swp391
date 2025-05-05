@@ -42,7 +42,7 @@ interface UserFormProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   initialData?: User | null;
-  onSubmitSuccess: () => void;
+  onSubmitSuccess: (action: "create" | "update", username: string) => void;
 }
 
 export const UserForm: React.FC<UserFormProps> = ({
@@ -383,13 +383,22 @@ export const UserForm: React.FC<UserFormProps> = ({
 
         if (response.success) {
           setFormState("success");
-          toast.success("Cập nhật người dùng thành công");
+
+          // Hiển thị thông báo thành công
+          toast.success("Cập nhật người dùng thành công", {
+            position: "top-center",
+            duration: 3000,
+            icon: <CheckCircle className="h-5 w-5 text-green-500" />,
+          });
+
+          // Hiển thị thông báo thành công trong form trước khi đóng
+          setFormError(null);
 
           // Close dialog after a short delay
           setTimeout(() => {
             onOpenChange(false);
-            onSubmitSuccess();
-          }, 1000);
+            onSubmitSuccess("update", formData.username || "");
+          }, 1500);
         } else {
           console.error("Update failed:", response);
           setFormState("error");
@@ -420,13 +429,22 @@ export const UserForm: React.FC<UserFormProps> = ({
 
         if (response.success) {
           setFormState("success");
-          toast.success("Tạo người dùng thành công");
+
+          // Hiển thị thông báo thành công
+          toast.success("Tạo người dùng thành công", {
+            position: "top-center",
+            duration: 3000,
+            icon: <UserPlus className="h-5 w-5 text-green-500" />,
+          });
+
+          // Hiển thị thông báo thành công trong form trước khi đóng
+          setFormError(null);
 
           // Close dialog after a short delay
           setTimeout(() => {
             onOpenChange(false);
-            onSubmitSuccess();
-          }, 1000);
+            onSubmitSuccess("create", formData.username || "");
+          }, 1500);
         } else {
           console.error("Create failed:", response);
           setFormState("error");
@@ -561,6 +579,18 @@ export const UserForm: React.FC<UserFormProps> = ({
               : "Tạo tài khoản người dùng mới với quyền truy cập phù hợp"}
           </p>
         </DialogHeader>
+
+        {/* Success message display */}
+        {formState === "success" && (
+          <Alert className="mt-2 mb-4 bg-green-50 border-green-200">
+            <CheckCircle className="h-4 w-4 mr-2 text-green-500 flex-shrink-0" />
+            <AlertDescription className="text-green-700">
+              {initialData
+                ? "Người dùng đã được cập nhật thành công!"
+                : "Người dùng mới đã được tạo thành công!"}
+            </AlertDescription>
+          </Alert>
+        )}
 
         {/* Error message display */}
         {formError && formState === "error" && (

@@ -26,7 +26,7 @@ interface DeleteUserDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   user: User | null;
-  onDeleteSuccess: () => void;
+  onDeleteSuccess: (deletedUser: User) => void;
 }
 
 export const DeleteUserDialog: React.FC<DeleteUserDialogProps> = ({
@@ -72,13 +72,22 @@ export const DeleteUserDialog: React.FC<DeleteUserDialogProps> = ({
       if (response && response.success) {
         // Show success state
         setDialogState("success");
-        toast.success("Người dùng đã được xóa thành công");
+
+        // Hiển thị thông báo thành công
+        toast.success("Người dùng đã được xóa thành công", {
+          position: "top-center",
+          duration: 3000,
+          icon: <Trash2 className="h-5 w-5 text-green-500" />,
+        });
 
         // Close dialog after a short delay
         setTimeout(() => {
-          onDeleteSuccess();
+          // Đảm bảo user không null trước khi gọi callback
+          if (user) {
+            onDeleteSuccess(user);
+          }
           handleOpenChange(false);
-        }, 1500);
+        }, 2000);
       } else {
         console.error("Delete response not successful:", response);
         setDialogState("error");
@@ -189,15 +198,19 @@ export const DeleteUserDialog: React.FC<DeleteUserDialogProps> = ({
         {/* Success State */}
         {dialogState === "success" && (
           <div className="py-6 px-4 text-center">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100 mb-4">
-              <CheckCircle className="h-6 w-6 text-green-600" />
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 mb-4">
+              <CheckCircle className="h-8 w-8 text-green-600" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h3 className="text-xl font-medium text-gray-900 mb-2">
               Xóa thành công
             </h3>
-            <p className="text-sm text-gray-500 mb-5">
-              Người dùng {user.username} đã được xóa thành công khỏi hệ thống.
+            <p className="text-base text-gray-600 mb-5">
+              Người dùng <span className="font-semibold">{user.username}</span>{" "}
+              đã được xóa thành công khỏi hệ thống.
             </p>
+            <div className="animate-pulse text-sm text-gray-500">
+              Cửa sổ này sẽ tự động đóng sau vài giây...
+            </div>
           </div>
         )}
 

@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { UserForm } from "./components/UserForm";
 import { DeleteUserDialog } from "./components/DeleteUserDialog";
+import { SuccessDialog } from "@/components/SuccessDialog";
 import {
   Search,
   Plus,
@@ -39,11 +40,19 @@ export function Users(): React.ReactElement {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Dialog states
   const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
   const [isEditUserDialogOpen, setIsEditUserDialogOpen] = useState(false);
   const [isDeleteUserDialogOpen, setIsDeleteUserDialogOpen] = useState(false);
+
+  // Success dialog state
+  const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
+  const [successDialogData, setSuccessDialogData] = useState({
+    title: "",
+    message: "",
+  });
 
   // Fetch users on component mount and when needed
   useEffect(() => {
@@ -53,11 +62,18 @@ export function Users(): React.ReactElement {
   const fetchUsers = async () => {
     setIsLoading(true);
     setError(null);
+    setSuccessMessage(null); // Xóa thông báo thành công khi làm mới danh sách
 
     try {
       const response = await usersApi.getAll();
       if (response.success) {
         setUsers(response.data);
+
+        // Hiển thị thông báo thành công khi làm mới danh sách
+        toast.success(`Đã tải ${response.data.length} người dùng thành công`, {
+          position: "top-center",
+          icon: <RefreshCw className="h-5 w-5 text-green-500" />,
+        });
       } else {
         const errorMessage =
           response.message || "Không thể tải danh sách người dùng";
@@ -107,9 +123,64 @@ export function Users(): React.ReactElement {
     setIsEditUserDialogOpen(true);
   };
 
+  // Xử lý sau khi thêm hoặc cập nhật người dùng thành công
+  const handleUserFormSuccess = (
+    action: "create" | "update",
+    username: string
+  ) => {
+    // Hiển thị thông báo thành công
+    const message =
+      action === "create"
+        ? `Người dùng ${username} đã được tạo thành công`
+        : `Người dùng ${username} đã được cập nhật thành công`;
+
+    setSuccessMessage(message);
+
+    // Tự động ẩn thông báo sau 5 giây
+    setTimeout(() => {
+      setSuccessMessage(null);
+    }, 5000);
+
+    // Làm mới danh sách người dùng
+    fetchUsers();
+  };
+
   const handleDelete = (user: User) => {
     setSelectedUser(user);
     setIsDeleteUserDialogOpen(true);
+  };
+
+  // Xử lý sau khi xóa người dùng thành công
+  const handleDeleteSuccess = (deletedUser: User) => {
+    // Xóa thông báo lỗi nếu có
+    setError(null);
+
+    // Hiển thị thông báo thành công trong trang
+    setSuccessMessage(
+      `Người dùng ${deletedUser.username} đã được xóa thành công`
+    );
+
+    // Hiển thị toast thông báo thành công
+    toast.success(`Đã xóa người dùng ${deletedUser.username} thành công`, {
+      position: "top-center",
+      duration: 3000,
+      icon: <Trash2 className="h-5 w-5 text-green-500" />,
+    });
+
+    // Hiển thị popup thông báo thành công
+    setSuccessDialogData({
+      title: "Xóa người dùng thành công!",
+      message: `Người dùng ${deletedUser.username} đã được xóa thành công khỏi hệ thống.`,
+    });
+    setIsSuccessDialogOpen(true);
+
+    // Tự động ẩn thông báo sau 5 giây
+    setTimeout(() => {
+      setSuccessMessage(null);
+    }, 5000);
+
+    // Làm mới danh sách người dùng
+    fetchUsers();
   };
 
   const filteredUsers = users.filter(
@@ -189,6 +260,16 @@ export function Users(): React.ReactElement {
             Làm mới danh sách
           </Button>
         </div>
+
+        {/* Success message display */}
+        {successMessage && (
+          <Alert className="mt-4 bg-green-50 border-green-200">
+            <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
+            <AlertDescription className="text-green-700">
+              {successMessage}
+            </AlertDescription>
+          </Alert>
+        )}
 
         {/* Error message display */}
         {error && (
@@ -335,7 +416,7 @@ export function Users(): React.ReactElement {
       <UserForm
         isOpen={isAddUserDialogOpen}
         onOpenChange={setIsAddUserDialogOpen}
-        onSubmitSuccess={fetchUsers}
+        onSubmitSuccess={handleUserFormSuccess}
       />
 
       {/* Edit User Dialog */}
@@ -343,7 +424,7 @@ export function Users(): React.ReactElement {
         isOpen={isEditUserDialogOpen}
         onOpenChange={setIsEditUserDialogOpen}
         initialData={selectedUser}
-        onSubmitSuccess={fetchUsers}
+        onSubmitSuccess={handleUserFormSuccess}
       />
 
       {/* Delete User Dialog */}
@@ -351,7 +432,16 @@ export function Users(): React.ReactElement {
         isOpen={isDeleteUserDialogOpen}
         onOpenChange={setIsDeleteUserDialogOpen}
         user={selectedUser}
-        onDeleteSuccess={fetchUsers}
+        onDeleteSuccess={handleDeleteSuccess}
+      />
+
+      {/* Success Dialog */}
+      <SuccessDialog
+        isOpen={isSuccessDialogOpen}
+        onClose={() => setIsSuccessDialogOpen(false)}
+        title={successDialogData.title}
+        message={successDialogData.message}
+        autoCloseDelay={4000}
       />
     </div>
   );
