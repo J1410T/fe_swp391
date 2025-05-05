@@ -62,8 +62,23 @@ export const CampusForm: React.FC<CampusFormProps> = ({
   };
 
   const handleSubmit = async () => {
-    if (!formData.name || !formData.code) {
-      toast.error("Vui lòng nhập tên và mã cơ sở");
+    // Kiểm tra các trường bắt buộc
+    if (!formData.name) {
+      toast.error("Vui lòng nhập tên cơ sở");
+      return;
+    }
+
+    if (!formData.code) {
+      toast.error("Vui lòng nhập mã cơ sở");
+      return;
+    }
+
+    // Kiểm tra định dạng email
+    if (
+      formData.contact.email &&
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.contact.email)
+    ) {
+      toast.error("Email không đúng định dạng");
       return;
     }
 
@@ -83,29 +98,68 @@ export const CampusForm: React.FC<CampusFormProps> = ({
               },
             };
 
-            await campusesApi.update(initialData.id, cleanData);
+            try {
+              await campusesApi.update(initialData.id, cleanData);
+              toast.success("Cập nhật cơ sở thành công");
+              onSubmitSuccess(); // Gọi lại để làm mới danh sách
+              handleDialogOpenChange(false); // Đóng dialog
+            } catch (error: any) {
+              if (error.response && error.response.status === 409) {
+                toast.error("Mã cơ sở đã tồn tại. Vui lòng chọn mã khác.");
+              } else {
+                throw error;
+              }
+            }
           } else {
             throw new Error("Invalid 'id' in initialData for update operation");
           }
         } else {
           throw new Error("Missing 'id' in initialData for update operation");
         }
-        toast.success("Cập nhật cơ sở thành công");
+        // toast.success("Cập nhật cơ sở thành công");
       } else {
         // Create new campus
-        await campusesApi.create(formData);
-        toast.success("Thêm cơ sở thành công");
+        try {
+          await campusesApi.create(formData);
+          toast.success("Thêm cơ sở thành công");
+          // }
+          onSubmitSuccess(); // Gọi lại để làm mới danh sách
+          handleDialogOpenChange(false); // Đóng dialog
+        } catch (error: any) {
+          if (error.response && error.response.status === 409) {
+            toast.error("Mã cơ sở đã tồn tại. Vui lòng chọn mã khác.");
+          } else {
+            throw error;
+          }
+        }
       }
-      onSubmitSuccess(); // Gọi lại để làm mới danh sách
-      onOpenChange(false); // Đóng dialog
     } catch (error) {
       console.error("Lỗi khi xử lý:", error);
       toast.error("Đã xảy ra lỗi. Vui lòng thử lại.");
     }
   };
 
+  // Hàm xử lý khi đóng dialog
+  const handleDialogOpenChange = (open: boolean) => {
+    // Nếu dialog đóng lại và không có initialData (trường hợp thêm mới)
+    if (!open && !initialData) {
+      // Reset form về trạng thái ban đầu
+      setFormData({
+        name: "",
+        code: "",
+        address: "",
+        contact: {
+          phone: "",
+          email: "",
+        },
+      });
+    }
+    // Gọi hàm onOpenChange từ props
+    onOpenChange(open);
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog open={isOpen} onOpenChange={handleDialogOpenChange}>
       <DialogContent>
         <DialogTitle className="sr-only" />
         <DialogDescription />
@@ -180,7 +234,7 @@ export const CampusForm: React.FC<CampusFormProps> = ({
         <DialogFooter>
           <Button
             variant="outline"
-            onClick={() => onOpenChange(false)}
+            onClick={() => handleDialogOpenChange(false)}
             aria-hidden="false"
           >
             Hủy

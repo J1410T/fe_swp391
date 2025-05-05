@@ -6,6 +6,7 @@ import type { CampusesLoaderResponse } from "@/types/loaders/campus";
 import { campusesApi, type CampusResponse } from "@/api/resources/campuses";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import {
   Building2,
   Edit,
@@ -66,8 +67,10 @@ function CampusesContent(): React.ReactElement {
         fetchCampuses();
         setIsDeleteDialogOpen(false);
         setCampusToDelete(null);
+        toast.success("Xóa cơ sở thành công");
       } catch (error) {
         console.error("Error deleting campus:", error);
+        toast.error("Xóa cơ sở thất bại. Vui lòng thử lại sau.");
       }
     }
   };

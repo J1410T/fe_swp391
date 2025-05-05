@@ -88,15 +88,31 @@ export const DormitoryForm: React.FC<DormitoryFormProps> = ({
         toast.success("Thêm ký túc xá thành công");
       }
       onSubmitSuccess();
-      onOpenChange(false);
+      handleDialogOpenChange(false);
     } catch (error) {
       console.error("Lỗi khi xử lý:", error);
       toast.error("Đã xảy ra lỗi. Vui lòng thử lại.");
     }
   };
 
+  // Hàm xử lý khi đóng dialog
+  const handleDialogOpenChange = (open: boolean) => {
+    // Nếu dialog đóng lại và không có initialData (trường hợp thêm mới)
+    if (!open && !initialData) {
+      // Reset form về trạng thái ban đầu
+      setFormData({
+        name: "",
+        description: "",
+        capacity: 0,
+        campus_id: campusId,
+      });
+    }
+    // Gọi hàm onOpenChange từ props
+    onOpenChange(open);
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog open={isOpen} onOpenChange={handleDialogOpenChange}>
       <DialogContent className="max-w-md">
         <DialogTitle className="sr-only" />
         <DialogDescription />
@@ -124,11 +140,28 @@ export const DormitoryForm: React.FC<DormitoryFormProps> = ({
             </Label>
             <Input
               id="capacity"
-              type="number"
-              value={formData.capacity}
-              onChange={(e) =>
-                handleChange("capacity", parseInt(e.target.value) || 0)
-              }
+              type="text" // Đổi từ number sang text để có thể xử lý chuỗi
+              inputMode="numeric" // Vẫn hiển thị bàn phím số trên mobile
+              pattern="[0-9]*" // Chỉ cho phép nhập số
+              min="0"
+              value={formData.capacity === 0 ? "" : formData.capacity} // Hiển thị rỗng thay vì 0
+              onChange={(e) => {
+                // Loại bỏ số 0 ở đầu và chuyển đổi thành số
+                let inputValue = e.target.value;
+
+                // Loại bỏ các ký tự không phải số
+                inputValue = inputValue.replace(/[^0-9]/g, "");
+
+                // Loại bỏ số 0 ở đầu
+                if (inputValue.length > 1 && inputValue.startsWith("0")) {
+                  inputValue = inputValue.replace(/^0+/, "");
+                }
+
+                // Chuyển đổi thành số
+                const numValue = inputValue === "" ? 0 : parseInt(inputValue);
+
+                handleChange("capacity", numValue);
+              }}
               className="col-span-3"
               placeholder="Nhập sức chứa"
             />
@@ -150,7 +183,7 @@ export const DormitoryForm: React.FC<DormitoryFormProps> = ({
         <DialogFooter>
           <Button
             variant="outline"
-            onClick={() => onOpenChange(false)}
+            onClick={() => handleDialogOpenChange(false)}
             aria-hidden="false"
           >
             Hủy
