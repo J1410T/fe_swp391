@@ -18,6 +18,13 @@ export interface Campus {
   createdAt: string;
   /** Thời gian cập nhật */
   updatedAt: string;
+  /** Thông tin liên hệ */
+  contact: {
+    /** Số điện thoại liên hệ */
+    phone: string;
+    /** Email liên hệ */
+    email: string;
+  };
 }
 
 /**
@@ -26,7 +33,13 @@ export interface Campus {
 export interface CampusResponse {
   id: number;
   name: string;
+  code: string;
   address: string;
+  contact: {
+    phone: string;
+    email: string;
+  };
+  description: string;
 }
 
 /**
@@ -39,6 +52,11 @@ export interface CampusCreateData {
   code: string;
   /** Địa chỉ cơ sở */
   address: string;
+  /** Thông tin liên hệ */
+  contact: {
+    phone: string;
+    email: string;
+  };
   /** Mô tả cơ sở */
   description: string;
 }
