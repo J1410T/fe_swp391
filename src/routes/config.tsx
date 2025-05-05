@@ -13,21 +13,24 @@ import { usersRoute } from "@/routes/users";
 import authRoutes from "@/routes/auth";
 import { AuthGuard } from "@/components/auth/auth-guard";
 import Unauthorized from "@/pages/Unauthorized";
-
 import { Navigate } from "react-router-dom";
 
 /**
  * Main application routes configuration
  */
 export const routes: RouteObject[] = [
-  // Chuyển hướng từ trang chủ đến trang đăng nhập
+  // Chuyển hướng từ trang chủ đến trang admission-methods nếu đã đăng nhập
   {
     path: "/",
-    element: <Navigate to="/auth/login" replace />,
+    element: (
+      <AuthGuard>
+        <Navigate to="/admission-methods" replace />
+      </AuthGuard>
+    ),
   },
   // Các trang chính của ứng dụng (yêu cầu đăng nhập)
   {
-    path: "/",
+    path: "",
     element: (
       <AuthGuard>
         <MainLayout />
