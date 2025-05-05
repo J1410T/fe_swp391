@@ -51,7 +51,7 @@ const ViewMajorSheetComponent = ({ isOpen, onOpenChange, major }: ViewMajorSheet
             </Dialog.Overlay>
             <Dialog.Content asChild>
               <motion.div 
-                className="fixed left-[50%] top-[50%] z-50 w-[95%] max-w-xl translate-x-[-50%] translate-y-[-50%] rounded-xl border-2 border-orange-400 bg-white overflow-hidden shadow-xl overflow-y-auto max-h-[85vh] mx-auto"
+                className="fixed left-[50%] top-[50%] z-50 w-[95%] max-w-xl translate-x-[-50%] translate-y-[-50%] rounded-xl border-2 border-orange-400 bg-white overflow-hidden shadow-xl max-h-[85vh] mx-auto flex flex-col"
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
@@ -100,6 +100,7 @@ const ViewMajorSheetComponent = ({ isOpen, onOpenChange, major }: ViewMajorSheet
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.2 }}
+                  className="overflow-y-auto flex-1"
                 >
                   <div className="p-6">
                     {/* Thông tin cơ bản */}
@@ -176,14 +177,14 @@ const ViewMajorSheetComponent = ({ isOpen, onOpenChange, major }: ViewMajorSheet
                       <TabsList className="grid w-full grid-cols-2 mb-4">
                         <TabsTrigger 
                           value="admissions" 
-                          className="flex items-center gap-1.5 data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700"
+                          className="flex items-center gap-1.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-amber-500 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300 rounded-lg flex items-center gap-2"
                         >
                           <Building2 className="h-4 w-4" aria-hidden="true" />
                           Thông tin tuyển sinh
                         </TabsTrigger>
                         <TabsTrigger 
                           value="careers" 
-                          className="flex items-center gap-1.5 data-[state=active]:bg-green-50 data-[state=active]:text-green-700"
+                          className="flex items-center gap-1.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-amber-500 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300 rounded-lg flex items-center gap-2"
                         >
                           <Briefcase className="h-4 w-4" aria-hidden="true" />
                           Cơ hội nghề nghiệp

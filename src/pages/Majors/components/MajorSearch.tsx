@@ -38,18 +38,15 @@ export function MajorSearch({ onSearch, onAddNew, onSelectMajor }: MajorSearchPr
             const response = await majorsApi.getById(majorId);
             if (response.success && response.data) {
               // Nếu tìm thấy ngành học theo ID
-              if (onSelectMajor) {
-                onSelectMajor(response.data);
-              } else {
-                // Gửi code để hiển thị kết quả tìm kiếm
-                onSearch({ code: searchQuery });
-              }
+              // Luôn gọi onSearch để hiển thị kết quả trên UI
+              onSearch({ code: searchQuery });
               toast.success(`Đã tìm thấy ngành học: ${response.data.name}`);
               return;
             }
           } catch (error: any) {
             console.error("Không tìm thấy ngành học theo ID, chuyển sang tìm kiếm thông thường");
-            // Không hiển thị lỗi, tiếp tục tìm kiếm thông thường
+            // Hiển thị thông báo lỗi cụ thể
+            toast.error(`Không tìm thấy ngành học với mã ${searchQuery}`);
           }
         }
         

@@ -92,7 +92,7 @@ function MajorsConfigContent(): React.ReactElement {
           />
 
           <MajorsCardView
-            majors={majorsData.items} 
+            majors={majorsData.items.filter(major => major !== null && major !== undefined && major.id)} 
             totalItems={majorsData.total}
             pagination={pagination}
             onPageChange={handlePageChange}

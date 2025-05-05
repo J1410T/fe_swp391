@@ -54,7 +54,7 @@ export const MajorsCardView: React.FC<MajorsCardViewProps> = ({
         <h2 className="text-xl font-semibold text-gray-800 border-l-4 border-orange-400 pl-3">Danh sách ngành học</h2>
       </motion.div>
 
-      {majors.length === 0 ? (
+      {!majors || majors.length === 0 ? (
         <motion.div 
           className="text-center py-12 bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg border border-orange-100 shadow-sm"
           initial={{ opacity: 0, scale: 0.9 }}
@@ -97,7 +97,7 @@ export const MajorsCardView: React.FC<MajorsCardViewProps> = ({
           >
             {majors.map((major, index) => (
               <motion.div
-                key={major.id}
+                key={major.id || `major-${index}`}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1, duration: 0.3 }}
