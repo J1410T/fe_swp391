@@ -39,7 +39,17 @@ export function useMajors() {
     try {
       // Kiểm tra nếu có dữ liệu hợp lệ
       if (loaderData && loaderData.status === 'success' && loaderData.data) {
-        setMajorsData(loaderData.data);
+        // Đảm bảo items là một mảng hợp lệ
+        const validItems = Array.isArray(loaderData.data.items) 
+          ? loaderData.data.items.filter(item => item && item.id)
+          : [];
+        
+        setMajorsData({
+          ...loaderData.data,
+          items: validItems,
+          total: validItems.length
+        });
+        
         setPagination({ 
           page: loaderData.data.page || 1, 
           limit: loaderData.data.limit || 10 
@@ -83,20 +93,61 @@ export function useMajors() {
     try {
       // Xử lý trường hợp tìm kiếm theo mã ngành cụ thể (số nguyên)
       if (params.code && !params.name) {
-        const majorId = parseInt(params.code);
-        if (!isNaN(majorId)) {
+        const majorCode = params.code.trim();
+        // Kiểm tra xem có phải là mã ngành hợp lệ không (chỉ chứa số)
+        if (/^\d+$/.test(majorCode)) {
           try {
-            // Thử gọi API getById nếu là số nguyên
-            const detailResponse = await majorsApi.getById(majorId);
+            // Gọi API getById với mã ngành (sử dụng API /majors/{code})
+            const detailResponse = await majorsApi.getById(parseInt(majorCode));
             if (detailResponse.success && detailResponse.data) {
-              // Nếu tìm thấy ngành học theo ID
-              handleFilterByMajor(detailResponse.data);
-              toast.success(`Đã tìm thấy ngành học: ${detailResponse.data.name}`);
+              // Đảm bảo dữ liệu trả về là hợp lệ
+              const majorData = detailResponse.data;
+              console.log('Kết quả tìm kiếm theo mã ngành:', majorData);
+              
+              // Kiểm tra dữ liệu trả về có đầy đủ trường cần thiết không
+              if (majorData && majorData.id) {
+                // Tạo một mảng chứa ngành học đã tìm thấy
+                const paginatedData: PaginatedResponse<Major> = {
+                  items: [majorData],
+                  total: 1,
+                  page: 1,
+                  limit: pagination.limit,
+                  totalPages: 1
+                };
+                
+                // Cập nhật trực tiếp vào state
+                setMajorsData(paginatedData);
+                toast.success(`Đã tìm thấy ngành học: ${majorData.name}`);
+                return;
+              } else {
+                console.error('Dữ liệu ngành học không hợp lệ:', majorData);
+                toast.error('Dữ liệu ngành học không hợp lệ');
+              }
+            } else {
+              // Không tìm thấy theo mã ngành
+              toast.error(`Không tìm thấy ngành học với mã ${majorCode}`);
+              // Đặt lại dữ liệu về trạng thái trống
+              setMajorsData({
+                items: [],
+                total: 0,
+                page: 1,
+                limit: pagination.limit,
+                totalPages: 0
+              });
               return;
             }
           } catch (error) {
-            console.error("Lỗi khi tìm kiếm ngành học theo ID:", error);
-            // Nếu không tìm thấy theo ID, tiếp tục tìm theo code
+            console.error("Lỗi khi tìm kiếm ngành học theo mã ngành:", error);
+            // Nếu không tìm thấy theo mã ngành, hiển thị lỗi và đặt danh sách trống
+            toast.error(`Không tìm thấy ngành học với mã ${majorCode}`);
+            setMajorsData({
+              items: [],
+              total: 0,
+              page: 1,
+              limit: pagination.limit,
+              totalPages: 0
+            });
+            return;
           }
         }
       }
@@ -106,12 +157,12 @@ export function useMajors() {
       
       // Phân tách xử lý tìm kiếm theo mã và theo tên để tránh xung đột
       if (params.name && params.name.trim() !== "") {
-        // Chỉ dùng tham số name cho tìm kiếm theo tên - KHÔNG dùng phân trang
+        // Chỉ dùng tham số name cho tìm kiếm theo tên
         apiParams = { name: params.name };
       } 
       else if (params.code && params.code.trim() !== "") {
-        // Khi tìm theo code, không sử dụng phân trang vì API không chấp nhận
-        apiParams = { code: params.code };
+        // Khi tìm theo code, sử dụng tham số name vì API không chấp nhận tham số code trực tiếp
+        apiParams = { name: params.code };
       }
       else {
         // Nếu không có tiêu chí tìm kiếm, lấy danh sách không có phân trang
@@ -124,33 +175,47 @@ export function useMajors() {
       if (response.success) {
         // Xử lý dữ liệu trả về tùy theo loại tìm kiếm
         if (Array.isArray(response.data)) {
+          // Lọc để chỉ giữ lại các đối tượng hợp lệ
+          const validItems = response.data.filter(item => item && item.id);
+          
           // Tạo cấu trúc dữ liệu phân trang từ mảng kết quả
           const paginatedData: PaginatedResponse<Major> = {
-            items: response.data,
-            total: response.data.length,
+            items: validItems,
+            total: validItems.length,
             page: 1,
             limit: pagination.limit,
-            totalPages: Math.ceil(response.data.length / pagination.limit)
+            totalPages: Math.ceil(validItems.length / pagination.limit)
           };
           setMajorsData(paginatedData);
           
           // Hiển thị thông báo tùy theo kết quả
-          if (response.data.length === 0) {
+          if (validItems.length === 0) {
             toast.error("Không tìm thấy ngành học nào phù hợp");
           } else if ((params.code && params.code.trim() !== "") || (params.name && params.name.trim() !== "")) {
-            toast.success(`Đã tìm thấy ${response.data.length} ngành học`);
+            toast.success(`Đã tìm thấy ${validItems.length} ngành học`);
           } else {
-            toast.success(`Đã tải ${response.data.length} ngành học`);
+            toast.success(`Đã tải ${validItems.length} ngành học`);
           }
         } else if (response.data && typeof response.data === 'object') {
-          // Nếu dữ liệu đã có cấu trúc phân trang
-          setMajorsData(response.data as PaginatedResponse<Major>);
+          // Nếu dữ liệu đã có cấu trúc phân trang, lọc items hợp lệ
+          const paginatedResponse = response.data as PaginatedResponse<Major>;
+          const validItems = Array.isArray(paginatedResponse.items) 
+            ? paginatedResponse.items.filter(item => item && item.id)
+            : [];
+            
+          const validData = {
+            ...paginatedResponse,
+            items: validItems,
+            total: validItems.length
+          };
+          
+          setMajorsData(validData);
           
           // Hiển thị thông báo tùy theo kết quả
-          if ((response.data as PaginatedResponse<Major>).items.length === 0) {
+          if (validItems.length === 0) {
             toast.error("Không tìm thấy ngành học nào phù hợp");
           } else if ((params.code && params.code.trim() !== "") || (params.name && params.name.trim() !== "")) {
-            toast.success(`Đã tìm thấy ${(response.data as PaginatedResponse<Major>).items.length} ngành học`);
+            toast.success(`Đã tìm thấy ${validItems.length} ngành học`);
           }
         } else {
           // Trường hợp không có dữ liệu
@@ -201,7 +266,10 @@ export function useMajors() {
   
   // Xử lý hiển thị kết quả tìm kiếm từ API getById
   const handleFilterByMajor = (major: Major) => {
-    if (major) {
+    if (major && major.id) {
+      // Đảm bảo major là một đối tượng hợp lệ với đầy đủ thuộc tính
+      console.log('Tìm thấy ngành học:', major);
+      
       // Hiển thị ngành học đã tìm thấy trong danh sách
       const paginatedData: PaginatedResponse<Major> = {
         items: [major],
@@ -210,10 +278,18 @@ export function useMajors() {
         limit: pagination.limit,
         totalPages: 1
       };
+      
+      // Cập nhật dữ liệu hiển thị
       setMajorsData(paginatedData);
       
       // Đặt lại trạng thái phân trang
       setPagination({ ...pagination, page: 1 });
+      
+      // Hiển thị thông báo thành công
+      toast.success(`Đã tìm thấy ngành học: ${major.name}`);
+    } else {
+      console.error('Thông tin ngành học không hợp lệ:', major);
+      toast.error('Thông tin ngành học không hợp lệ');
     }
   };
 
@@ -227,21 +303,49 @@ export function useMajors() {
     setPagination({ ...pagination, page });
     
     try {
+      // Kiểm tra xem có đang tìm kiếm theo mã ngành (số) hay không
+      if (searchQuery && /^\d+$/.test(searchQuery.trim())) {
+        // Nếu đang tìm kiếm theo mã ngành, thử gọi API getById trước
+        try {
+          const detailResponse = await majorsApi.getById(parseInt(searchQuery.trim()));
+          if (detailResponse.success && detailResponse.data) {
+            // Nếu tìm thấy ngành học theo mã ngành, cập nhật lại state
+            const majorData = detailResponse.data;
+            
+            // Kiểm tra dữ liệu hợp lệ
+            if (majorData && majorData.id) {
+              // Tạo một mảng chứa ngành học đã tìm thấy
+              const paginatedData: PaginatedResponse<Major> = {
+                items: [majorData],
+                total: 1,
+                page: 1,
+                limit: pagination.limit,
+                totalPages: 1
+              };
+              
+              // Cập nhật trực tiếp vào state
+              setMajorsData(paginatedData);
+              return;
+            } else {
+              console.error('Dữ liệu ngành học không hợp lệ:', majorData);
+              // Tiếp tục với tìm kiếm thông thường
+            }
+          }
+        } catch (error) {
+          console.error("Lỗi khi tìm kiếm ngành học theo mã ngành khi chuyển trang:", error);
+          // Nếu không tìm thấy theo mã ngành, tiếp tục tìm kiếm thông thường
+        }
+      }
+      
       // Xử lý tìm kiếm thông thường (cả khi không có nội dung tìm kiếm)
       const apiParams: any = {
         page: page,
         limit: pagination.limit
       };
       
-      // Phân tích searchQuery để xác định loại tìm kiếm
+      // Thêm tham số tìm kiếm nếu có
       if (searchQuery) {
-        // Kiểm tra xem searchQuery có phải là mã ngành (số) hay không
-        const majorId = parseInt(searchQuery);
-        if (!isNaN(majorId)) {
-          apiParams.code = searchQuery;
-        } else {
-          apiParams.name = searchQuery;
-        }
+        apiParams.name = searchQuery;
       }
       
       // Gọi API để lấy dữ liệu trang mới
@@ -249,18 +353,33 @@ export function useMajors() {
       if (response.success) {
         // Kiểm tra nếu dữ liệu trả về là mảng
         if (Array.isArray(response.data)) {
+          // Lọc để chỉ giữ lại các đối tượng hợp lệ
+          const validItems = response.data.filter(item => item && item.id);
+          
           // Tạo cấu trúc dữ liệu phân trang từ mảng
           const paginatedData: PaginatedResponse<Major> = {
-            items: response.data,
-            total: response.data.length,
+            items: validItems,
+            total: validItems.length,
             page: page,
             limit: pagination.limit,
-            totalPages: Math.ceil(response.data.length / pagination.limit)
+            totalPages: Math.ceil(validItems.length / pagination.limit)
           };
           setMajorsData(paginatedData);
         } else if (response.data && typeof response.data === 'object') {
-          // Nếu dữ liệu đã có cấu trúc phân trang
-          setMajorsData(response.data as PaginatedResponse<Major>);
+          // Nếu dữ liệu đã có cấu trúc phân trang, lọc items hợp lệ
+          const paginatedResponse = response.data as PaginatedResponse<Major>;
+          const validItems = Array.isArray(paginatedResponse.items) 
+            ? paginatedResponse.items.filter(item => item && item.id)
+            : [];
+            
+          const validData = {
+            ...paginatedResponse,
+            items: validItems,
+            total: validItems.length,
+            page: page
+          };
+          
+          setMajorsData(validData);
         } else {
           // Trường hợp không có dữ liệu
           setMajorsData({
