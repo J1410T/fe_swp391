@@ -20,7 +20,7 @@ const ViewMajorSheetComponent = ({ isOpen, onOpenChange, major }: ViewMajorSheet
   if (!major) return null;
 
   // State để quản lý tab đang được chọn
-  const [activeTab, setActiveTab] = useState<string>("admissions");
+  const [_activeTab, setActiveTab] = useState<string>("admissions");
 
   // Hàm format tiền tệ với xử lý lỗi
   const formatCurrency = (amount: number): string => {
