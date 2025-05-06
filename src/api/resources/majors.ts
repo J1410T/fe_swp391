@@ -169,36 +169,9 @@ export const majorsApi = {
    */
   getByAcademicYear: async (academicYear: string | number): Promise<ApiResponse<MajorWithCampusData[]>> => {
     try {
-      // Lấy token từ localStorage
-      const token = localStorage.getItem('auth_token');
-      let tokenValue = null;
-
-      if (token) {
-        try {
-          const tokenData = JSON.parse(token);
-          tokenValue = tokenData.value;
-        } catch (e) {
-          // Lỗi khi parse token
-        }
-      }
-
-      // Gửi request lấy danh sách ngành học với token xác thực
-      const response = await fetch(`${API_PATH}?academic_year=${academicYear}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(tokenValue ? { 'Authorization': `Bearer ${tokenValue}` } : {})
-        }
+      return await api.get<ApiResponse<MajorWithCampusData[]>>(API_PATH, {
+        params: { academic_year: academicYear }
       });
-
-      // Đọc response
-      const responseData = await response.json();
-
-      if (!response.ok) {
-        throw new Error(responseData.message || `HTTP error! status: ${response.status}`);
-      }
-
-      return responseData;
     } catch (error) {
       // Xử lý lỗi khi lấy danh sách ngành học
       throw error;
