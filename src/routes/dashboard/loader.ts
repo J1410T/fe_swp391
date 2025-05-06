@@ -17,11 +17,12 @@ export const loadDashboardData: LoaderFunction = async (): Promise<DashboardLoad
         totalMajors: overallStatsResponse.data.total_majors,
         totalCampuses: overallStatsResponse.data.total_campuses,
         totalScholarships: overallStatsResponse.data.total_scholarships,
-        totalDormitories: overallStatsResponse.data.total_dormitories
+        totalDormitories: overallStatsResponse.data.total_dormitories,
+        totalAdmissionMethods: overallStatsResponse.data.total_admission_methods || 0
       }
     };
 
-    return { data };
+    return { data, status: 'success' as const };
   } catch (error) {
     console.error('Failed to load dashboard data:', error);
     throw new Error('Failed to load dashboard data');

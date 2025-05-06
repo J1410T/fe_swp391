@@ -18,10 +18,10 @@ interface ViewMajorSheetProps {
  */
 const ViewMajorSheetComponent = ({ isOpen, onOpenChange, major }: ViewMajorSheetProps) => {
   if (!major) return null;
-  
+
   // State để quản lý tab đang được chọn
-  const [activeTab, setActiveTab] = useState<string>("admissions");
-  
+  const [setActiveTab] = useState<string>("admissions");
+
   // Hàm format tiền tệ với xử lý lỗi
   const formatCurrency = (amount: number): string => {
     try {
@@ -41,7 +41,7 @@ const ViewMajorSheetComponent = ({ isOpen, onOpenChange, major }: ViewMajorSheet
         {isOpen && (
           <Dialog.Portal forceMount>
             <Dialog.Overlay asChild>
-              <motion.div 
+              <motion.div
                 className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -50,12 +50,12 @@ const ViewMajorSheetComponent = ({ isOpen, onOpenChange, major }: ViewMajorSheet
               />
             </Dialog.Overlay>
             <Dialog.Content asChild>
-              <motion.div 
+              <motion.div
                 className="fixed left-[50%] top-[50%] z-50 w-[95%] max-w-xl translate-x-[-50%] translate-y-[-50%] rounded-xl border-2 border-orange-400 bg-white overflow-hidden shadow-xl max-h-[85vh] mx-auto flex flex-col"
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ 
+                transition={{
                   type: "spring",
                   damping: 20,
                   stiffness: 300,
@@ -63,7 +63,7 @@ const ViewMajorSheetComponent = ({ isOpen, onOpenChange, major }: ViewMajorSheet
                 }}
               >
 
-                <motion.div 
+                <motion.div
                   className="relative bg-gradient-to-r from-orange-400 to-amber-500 p-6 pb-4 rounded-t-xl shadow-md"
                   initial={{ y: -20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
@@ -80,13 +80,13 @@ const ViewMajorSheetComponent = ({ isOpen, onOpenChange, major }: ViewMajorSheet
                       </motion.button>
                     </Dialog.Close>
                   </div>
-                  
+
                   <div className="flex items-center justify-center mb-3">
                     <div className="bg-white/20 p-2.5 rounded-full">
                       <GraduationCap className="h-6 w-6 text-white" />
                     </div>
                   </div>
-                  
+
                   <Dialog.Title className="text-2xl font-bold text-center text-white overflow-hidden text-ellipsis max-w-[90%] mx-auto">
                     Chi tiết ngành học
                   </Dialog.Title>
@@ -94,7 +94,7 @@ const ViewMajorSheetComponent = ({ isOpen, onOpenChange, major }: ViewMajorSheet
                     Thông tin chi tiết về ngành học
                   </Dialog.Description>
                 </motion.div>
-          
+
                 {/* Hiển thị thông tin chi tiết ngành học */}
                 <motion.div
                   initial={{ opacity: 0 }}
@@ -133,10 +133,10 @@ const ViewMajorSheetComponent = ({ isOpen, onOpenChange, major }: ViewMajorSheet
                       <div className="flex flex-wrap mb-4 gap-2">
                         <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-200 flex items-center">
                           <Building2 className="h-3 w-3 mr-1" aria-hidden="true" />
-                          {major.majorCampusAdmissions && major.majorCampusAdmissions.length > 0 ? 
+                          {major.majorCampusAdmissions && major.majorCampusAdmissions.length > 0 ?
                             new Set(major.majorCampusAdmissions.map(a => a.campus?.code).filter(Boolean)).size : 0} cơ sở đào tạo
                         </Badge>
-                        
+
                         <Badge variant="secondary" className="bg-green-50 text-green-700 border-green-200 flex items-center">
                           <Briefcase className="h-3 w-3 mr-1" aria-hidden="true" />
                           {major.careers?.length || 0} cơ hội nghề nghiệp
@@ -175,22 +175,22 @@ const ViewMajorSheetComponent = ({ isOpen, onOpenChange, major }: ViewMajorSheet
                     {/* Tabs cho thông tin tuyển sinh và cơ hội nghề nghiệp */}
                     <Tabs defaultValue="admissions" className="w-full mt-4" onValueChange={setActiveTab}>
                       <TabsList className="grid w-full grid-cols-2 mb-4">
-                        <TabsTrigger 
-                          value="admissions" 
+                        <TabsTrigger
+                          value="admissions"
                           className="flex items-center gap-1.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-amber-500 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300 rounded-lg flex items-center gap-2"
                         >
                           <Building2 className="h-4 w-4" aria-hidden="true" />
                           Thông tin tuyển sinh
                         </TabsTrigger>
-                        <TabsTrigger 
-                          value="careers" 
+                        <TabsTrigger
+                          value="careers"
                           className="flex items-center gap-1.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-amber-500 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300 rounded-lg flex items-center gap-2"
                         >
                           <Briefcase className="h-4 w-4" aria-hidden="true" />
                           Cơ hội nghề nghiệp
                         </TabsTrigger>
                       </TabsList>
-                      
+
                       {/* Tab nội dung thông tin tuyển sinh */}
                       <TabsContent value="admissions" className="mt-0">
                         {major.majorCampusAdmissions && major.majorCampusAdmissions.length > 0 ? (
@@ -202,7 +202,7 @@ const ViewMajorSheetComponent = ({ isOpen, onOpenChange, major }: ViewMajorSheet
                           >
                             <div className="space-y-4">
                               {major.majorCampusAdmissions.map((admission, index) => (
-                                <div 
+                                <div
                                   key={`${admission.campus?.code || 'unknown'}-${index}`}
                                   className="bg-blue-50 rounded-lg p-4 border border-blue-100 hover:border-blue-300 transition-colors"
                                 >
@@ -235,7 +235,7 @@ const ViewMajorSheetComponent = ({ isOpen, onOpenChange, major }: ViewMajorSheet
                             </div>
                           </motion.div>
                         ) : (
-                          <motion.div 
+                          <motion.div
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.3 }}
@@ -246,7 +246,7 @@ const ViewMajorSheetComponent = ({ isOpen, onOpenChange, major }: ViewMajorSheet
                           </motion.div>
                         )}
                       </TabsContent>
-                      
+
                       {/* Tab nội dung cơ hội nghề nghiệp */}
                       <TabsContent value="careers" className="mt-0">
                         {major.careers && major.careers.length > 0 ? (
@@ -257,7 +257,7 @@ const ViewMajorSheetComponent = ({ isOpen, onOpenChange, major }: ViewMajorSheet
                           >
                             <div className="space-y-4">
                               {major.careers.map((career) => (
-                                <div 
+                                <div
                                   key={career.id}
                                   className="bg-green-50 rounded-lg p-4 border border-green-100 hover:border-green-300 transition-colors"
                                 >
@@ -266,7 +266,7 @@ const ViewMajorSheetComponent = ({ isOpen, onOpenChange, major }: ViewMajorSheet
                                       <Sparkles className="h-3.5 w-3.5 text-green-600" />
                                     </div>
                                     <h4 className="font-medium text-gray-800">{career.name}</h4>
-                                    
+
                                     <div className="ml-auto">
                                       <Badge variant="outline" className="bg-green-100 text-green-700 border-green-200">
                                         {career.category}
@@ -274,14 +274,14 @@ const ViewMajorSheetComponent = ({ isOpen, onOpenChange, major }: ViewMajorSheet
                                     </div>
                                   </div>
                                   <p className="text-sm text-gray-600 ml-7 mb-3">{career.description}</p>
-                                  
+
                                   <div className="flex items-center ml-7 bg-white px-3 py-2 rounded-md border border-green-200 w-fit">
                                     <Calculator className="h-3.5 w-3.5 text-green-500 mr-1.5" aria-hidden="true" />
                                     <p className="text-xs text-gray-600">
                                       Mức lương: <span className="font-medium text-green-700">
-                                        {career.salary_range ? 
-                                          (career.salary_range.includes('-') ? 
-                                            career.salary_range.replace("-", " - ") : 
+                                        {career.salary_range ?
+                                          (career.salary_range.includes('-') ?
+                                            career.salary_range.replace("-", " - ") :
                                             career.salary_range
                                           ) + " VNĐ" :
                                           "Chưa có thông tin"
@@ -289,10 +289,10 @@ const ViewMajorSheetComponent = ({ isOpen, onOpenChange, major }: ViewMajorSheet
                                       </span>
                                     </p>
                                   </div>
-                                  
+
                                   {career.info_url && (
                                     <div className="mt-3 ml-7">
-                                      <a 
+                                      <a
                                         href={career.info_url}
                                         target="_blank"
                                         rel="noopener noreferrer"
@@ -309,7 +309,7 @@ const ViewMajorSheetComponent = ({ isOpen, onOpenChange, major }: ViewMajorSheet
                             </div>
                           </motion.div>
                         ) : (
-                          <motion.div 
+                          <motion.div
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.3 }}
@@ -323,8 +323,8 @@ const ViewMajorSheetComponent = ({ isOpen, onOpenChange, major }: ViewMajorSheet
                     </Tabs>
                   </div>
                 </motion.div>
-                
-                <motion.div 
+
+                <motion.div
                   className="p-6 bg-gradient-to-r from-gray-50 to-orange-50 border-t border-gray-200/70"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -333,8 +333,8 @@ const ViewMajorSheetComponent = ({ isOpen, onOpenChange, major }: ViewMajorSheet
                   <div className="flex justify-end">
                     <Dialog.Close asChild>
                       <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant="outline"
                           className="bg-white hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200 text-gray-700 border-gray-300 font-medium transition-colors shadow-sm"
                           aria-label="Đóng chi tiết ngành học"
                         >
@@ -345,7 +345,7 @@ const ViewMajorSheetComponent = ({ isOpen, onOpenChange, major }: ViewMajorSheet
                     </Dialog.Close>
                   </div>
                 </motion.div>
-          
+
               </motion.div>
             </Dialog.Content>
           </Dialog.Portal>

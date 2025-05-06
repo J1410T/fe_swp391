@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { AlertTriangle, CheckCircle2, AlertCircle, X } from "lucide-react";
+import { AlertTriangle, CheckCircle2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { majorsApi } from "@/api/resources/majors";
 import { Major } from "@/types/entities/major";
@@ -49,12 +49,12 @@ export const DeleteMajorDialog: React.FC<DeleteMajorDialogProps> = ({
         // Hiển thị thông báo thành công
         setDialogState("success");
         toast.success(`Đã xóa ngành học ${major.name} thành công!`);
-        
+
         // Đặt timeout để đóng dialog sau khi hiển thị thông báo
         setTimeout(() => {
           onOpenChange(false);
           setDialogState("confirm");
-          
+
           // Callback sau khi xóa thành công
           if (onDeleted) {
             onDeleted();
@@ -76,7 +76,7 @@ export const DeleteMajorDialog: React.FC<DeleteMajorDialogProps> = ({
       setIsDeleting(false);
     }
   };
-  
+
   // Reset state khi dialog đóng
   const handleOpenChange = (open: boolean) => {
     if (!open) {
@@ -106,7 +106,7 @@ export const DeleteMajorDialog: React.FC<DeleteMajorDialogProps> = ({
             </AlertDialogDescription>
           </AlertDialogHeader>
         )}
-        
+
         {dialogState === "success" && (
           <div className="py-6 px-4 text-center">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-50 mb-4">
@@ -118,7 +118,7 @@ export const DeleteMajorDialog: React.FC<DeleteMajorDialogProps> = ({
             </p>
           </div>
         )}
-        
+
         {dialogState === "error" && (
           <div className="py-6 px-4 text-center">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-50 mb-4">
@@ -126,8 +126,8 @@ export const DeleteMajorDialog: React.FC<DeleteMajorDialogProps> = ({
             </div>
             <h2 className="text-xl font-semibold text-red-800 mb-2">Lỗi</h2>
             <p className="text-red-700">{errorMessage}</p>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="mt-4 bg-white hover:bg-gray-100 text-gray-700 border-gray-300"
               onClick={() => setDialogState("confirm")}
             >
@@ -138,16 +138,16 @@ export const DeleteMajorDialog: React.FC<DeleteMajorDialogProps> = ({
         {dialogState === "confirm" && (
           <AlertDialogFooter className="sm:justify-center space-x-3 mt-6">
             <AlertDialogCancel asChild>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="bg-white hover:bg-gray-100 text-gray-700 border-gray-300 min-w-[100px]"
               >
                 Hủy bỏ
               </Button>
             </AlertDialogCancel>
             <AlertDialogAction asChild>
-              <Button 
-                variant="destructive" 
+              <Button
+                variant="destructive"
                 onClick={handleDelete}
                 disabled={isDeleting}
                 className="bg-red-500 hover:bg-red-600 text-white min-w-[100px]"

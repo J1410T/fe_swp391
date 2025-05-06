@@ -1,9 +1,4 @@
 import type { BaseLoaderResponse } from '../common';
-import type { Major } from '../entities/major';
-import type { Campus } from '../entities/campus';
-import type { AdmissionMethod } from '../entities/admission-method';
-import type { Scholarship } from '../entities/scholarship';
-import type { Dormitory } from '../entities/dormitory';
 
 /**
  * Thống kê tổng quan

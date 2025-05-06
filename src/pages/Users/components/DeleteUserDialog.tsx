@@ -19,7 +19,6 @@ import {
   AlertTriangle,
   CheckCircle,
   AlertCircle,
-  X,
 } from "lucide-react";
 
 interface DeleteUserDialogProps {

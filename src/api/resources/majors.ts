@@ -4,7 +4,7 @@
 
 import { api } from '@/api/base';
 import type { Major, MajorCreateData, MajorUpdateData } from '@/types/entities/major';
-import type { ApiResponse, PaginatedResponse, PaginationParams, FilterParams, SortParams } from '@/types';
+import type { ApiResponse, PaginationParams, FilterParams, SortParams } from '@/types';
 import { createResource } from '@/utils/suspense';
 
 // Endpoint cho ngành học

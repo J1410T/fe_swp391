@@ -6,6 +6,8 @@ import { api } from "../base";
 import type { ApiResponse } from "@/types";
 import type { DormitoryResponse } from "@/types/entities/dormitory";
 
+export type { DormitoryResponse };
+
 /**
  * API cho ký túc xá
  */

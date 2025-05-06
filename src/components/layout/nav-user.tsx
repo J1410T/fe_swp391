@@ -10,10 +10,8 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
@@ -28,7 +26,7 @@ import Flag_of_Vietnam from "../../assets/images/Flag_of_Vietnam.svg.png"
 export function NavUser() {
   // Sử dụng thông tin người dùng từ AuthContext
   const { user, logout } = useAuth();
-  
+
   // Nếu không có thông tin người dùng, hiển thị avatar mặc định
   const userInfo = {
     name: user?.username || 'Người dùng',

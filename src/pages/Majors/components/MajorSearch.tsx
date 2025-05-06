@@ -18,7 +18,7 @@ interface MajorSearchProps {
 /**
  * Component tìm kiếm và lọc ngành học
  */
-export function MajorSearch({ onSearch, onAddNew, onSelectMajor }: MajorSearchProps) {
+export function MajorSearch({ onSearch, onAddNew }: MajorSearchProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
@@ -27,7 +27,7 @@ export function MajorSearch({ onSearch, onAddNew, onSelectMajor }: MajorSearchPr
     e.preventDefault();
     setIsSearching(true);
     setSearchError(null); // Reset lỗi khi bắt đầu tìm kiếm mới
-    
+
     try {
       if (searchQuery.trim()) {
         // Kiểm tra xem searchQuery có phải là số không (có thể là mã ngành)
@@ -49,7 +49,7 @@ export function MajorSearch({ onSearch, onAddNew, onSelectMajor }: MajorSearchPr
             toast.error(`Không tìm thấy ngành học với mã ${searchQuery}`);
           }
         }
-        
+
         // Nếu không phải ID hoặc không tìm thấy theo ID, thử tìm kiếm theo tên
         onSearch({ name: searchQuery.trim() });
       } else {
@@ -58,7 +58,7 @@ export function MajorSearch({ onSearch, onAddNew, onSelectMajor }: MajorSearchPr
       }
     } catch (error: any) {
       console.error("Lỗi khi tìm kiếm ngành học:", error);
-      
+
       // Xử lý lỗi 400 - Validation error
       if (error.message && error.message.includes('400')) {
         const errorMessage = `Tìm kiếm không hợp lệ: "${searchQuery}". Hãy thử tìm kiếm với từ khóa khác.`;
@@ -67,7 +67,7 @@ export function MajorSearch({ onSearch, onAddNew, onSelectMajor }: MajorSearchPr
       } else {
         toast.error("Có lỗi xảy ra khi tìm kiếm ngành học");
       }
-      
+
       onSearch({}); // Hiển thị tất cả khi có lỗi
     } finally {
       setIsSearching(false);
@@ -83,8 +83,8 @@ export function MajorSearch({ onSearch, onAddNew, onSelectMajor }: MajorSearchPr
   // Animation variants - Đã được tối ưu hóa để hoạt động nhất quán
   const containerVariants = {
     hidden: { opacity: 0, y: -10 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
       transition: {
         duration: 0.3,
@@ -95,8 +95,8 @@ export function MajorSearch({ onSearch, onAddNew, onSelectMajor }: MajorSearchPr
 
   const itemVariants = {
     hidden: { opacity: 0, y: 5 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
       transition: {
         type: "spring",
@@ -107,7 +107,7 @@ export function MajorSearch({ onSearch, onAddNew, onSelectMajor }: MajorSearchPr
   };
 
   return (
-    <motion.div 
+    <motion.div
       className="bg-white p-5 rounded-xl shadow-md border border-orange-100 mb-8 transition-all duration-300 hover:shadow-lg"
       variants={containerVariants}
       initial="hidden"
@@ -115,7 +115,7 @@ export function MajorSearch({ onSearch, onAddNew, onSelectMajor }: MajorSearchPr
       whileHover={{ boxShadow: "0 10px 25px -5px rgba(249, 115, 22, 0.1), 0 8px 10px -6px rgba(249, 115, 22, 0.1)" }}
     >
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-        <motion.div 
+        <motion.div
           className="flex items-center mb-4 lg:mb-0 w-full lg:w-auto"
           variants={itemVariants}
         >
@@ -125,7 +125,7 @@ export function MajorSearch({ onSearch, onAddNew, onSelectMajor }: MajorSearchPr
           <div>
             <h2 className="text-lg font-semibold text-gray-800 flex items-center flex-wrap">
               <span className="whitespace-nowrap mr-2">Tìm kiếm ngành học</span>
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.2, duration: 0.2, type: "spring", stiffness: 300, damping: 20 }}
@@ -139,7 +139,7 @@ export function MajorSearch({ onSearch, onAddNew, onSelectMajor }: MajorSearchPr
             <p className="text-sm text-gray-500 whitespace-nowrap">Nhập mã hoặc tên ngành học để tìm kiếm</p>
           </div>
         </motion.div>
-        <motion.div 
+        <motion.div
           className="w-full lg:w-3/4"
           variants={itemVariants}
         >
@@ -162,7 +162,7 @@ export function MajorSearch({ onSearch, onAddNew, onSelectMajor }: MajorSearchPr
           <form onSubmit={handleSearch} className="w-full">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-grow">
-                <motion.div 
+                <motion.div
                   className="relative group"
                   whileHover={{ scale: 1.01 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
@@ -201,14 +201,14 @@ export function MajorSearch({ onSearch, onAddNew, onSelectMajor }: MajorSearchPr
                   </AnimatePresence>
                 </motion.div>
               </div>
-              
+
               <div className="md:flex-shrink-0">
                 <motion.div
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     size="sm"
                     disabled={isSearching}
                     className="bg-gradient-to-r from-orange-400 to-amber-500 hover:from-orange-500 hover:to-amber-600 text-white px-4 py-2.5 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 font-medium w-full md:w-auto"
@@ -238,8 +238,8 @@ export function MajorSearch({ onSearch, onAddNew, onSelectMajor }: MajorSearchPr
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button 
-                  onClick={onAddNew} 
+                <Button
+                  onClick={onAddNew}
                   className="w-full top-5 lg:w-auto bg-gradient-to-r from-orange-400 to-amber-500 hover:from-orange-500 hover:to-amber-600 text-white px-5 py-2.5 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 font-medium flex items-center justify-center whitespace-nowrap"
                 >
                   <Plus className="h-4 w-4 mr-2" />

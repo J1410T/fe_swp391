@@ -6,6 +6,8 @@ import { api } from '../base';
 import type { ApiResponse } from '@/types';
 import type { ScholarshipResponse } from '@/types/entities/scholarship';
 
+export type { ScholarshipResponse };
+
 /**
  * API cho học bổng
  */

@@ -6,6 +6,8 @@ import { api } from '../base';
 import type { ApiResponse } from '@/types';
 import type { CampusResponse } from '@/types/entities/campus';
 
+export type { CampusResponse };
+
 /**
  * API cho cơ sở đào tạo
  */
@@ -17,7 +19,7 @@ export const campusesApi = {
   getAll: async (): Promise<ApiResponse<CampusResponse[]>> => {
     return api.get<ApiResponse<CampusResponse[]>>('/campuses');
   },
-  
+
   /**
    * Lấy cơ sở đào tạo theo ID
    * @param id ID của cơ sở đào tạo
@@ -26,7 +28,7 @@ export const campusesApi = {
   getById: async (id: number): Promise<ApiResponse<CampusResponse>> => {
     return api.get<ApiResponse<CampusResponse>>(`/campuses/${id}`);
   },
-  
+
   /**
    * Tạo cơ sở đào tạo mới
    * @param data Dữ liệu cơ sở đào tạo
@@ -35,7 +37,7 @@ export const campusesApi = {
   create: async (data: Omit<CampusResponse, 'id'>): Promise<ApiResponse<CampusResponse>> => {
     return api.post<ApiResponse<CampusResponse>>('/campuses', data);
   },
-  
+
   /**
    * Cập nhật cơ sở đào tạo
    * @param id ID của cơ sở đào tạo
@@ -45,7 +47,7 @@ export const campusesApi = {
   update: async (id: number, data: Partial<Omit<CampusResponse, 'id'>>): Promise<ApiResponse<CampusResponse>> => {
     return api.put<ApiResponse<CampusResponse>>(`/campuses/${id}`, data);
   },
-  
+
   /**
    * Xóa cơ sở đào tạo
    * @param id ID của cơ sở đào tạo

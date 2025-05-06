@@ -190,7 +190,7 @@ function AdmissionMethodsContent(): React.ReactElement {
                   year={year.year}
                   expanded={expandedYear === year.year}
                   onToggle={() => toggleYearExpanded(year.year)}
-                  onDelete={() => handleDeleteYear(year.year)}
+                  onDelete={() => handleDeleteYear(String(year.year))}
                 >
                   <YearContentTabs
                     academicYear={year.year}
@@ -228,7 +228,7 @@ function AdmissionMethodsContent(): React.ReactElement {
         isOpen={isAddYearModalOpen}
         onClose={() => setIsAddYearModalOpen(false)}
         onSuccess={handleAddYear}
-        existingYears={academicYears.map((year) => year.year)}
+        existingYears={academicYears.map((year) => String(year.year))}
       />
 
       {selectedYear && (

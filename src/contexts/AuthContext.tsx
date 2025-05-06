@@ -72,7 +72,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.log("Đang làm mới token...");
 
       // Kiểm tra xem có refresh token không
-      const refreshToken = getRefreshToken();
+      getRefreshToken();
 
       // Thử lấy token hiện tại để làm backup
       const currentToken = getToken();
